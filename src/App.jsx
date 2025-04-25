@@ -21,6 +21,7 @@ function App() {
     console.log(urlParams, token)
 
     if (token) {
+      console.log("setting");
       localStorage.setItem('token', token);
       redirectIfRequire(token)
     }

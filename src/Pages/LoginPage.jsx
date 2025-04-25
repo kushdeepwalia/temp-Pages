@@ -58,6 +58,7 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
+    console.log("getting");
     if (localStorage.getItem('token')) {
       navigate('/organization')
     }
