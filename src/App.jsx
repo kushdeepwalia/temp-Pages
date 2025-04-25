@@ -20,6 +20,7 @@ function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('auth');
+    console.log(urlParams, token)
 
     if (token) {
       redirectIfRequire(token)
