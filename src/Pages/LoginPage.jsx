@@ -57,6 +57,12 @@ const LoginPage = () => {
       alert("Error")
   }
 
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/organization')
+    }
+  }, [])
+
   return <>
     <header className=" h-[68px] flex justify-end items-center pr-[16px]">
       <img src={iitLogo} />

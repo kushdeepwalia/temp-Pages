@@ -9,16 +9,12 @@ import { useCallback, useEffect } from 'react';
 import { fetchAndCacheTenantData } from './utils/fetchAndCacheTenantData';
 
 function App() {
-  const navigate = useNavigate();
 
   const redirectIfRequire = useCallback(async (token) => {
     localStorage.setItem('token', token);
 
     // Prefetch everything
     await fetchAndCacheTenantData();
-
-    navigate('/organization')
-
   }, [])
 
   useEffect(() => {
