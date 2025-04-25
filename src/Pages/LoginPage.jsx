@@ -45,11 +45,11 @@ const LoginPage = () => {
     const res = await api.post("/auth/login", { method: "credentials", email, pass: password });
     if (res.status === 200) {
       const { data } = res;
-      const { token } = data;
+      const { user, token } = data;
       localStorage.setItem('token', token);
 
       // Prefetch everything
-      await fetchAndCacheTenantData();
+      await fetchAndCacheTenantData(user.tenant_id);
 
       navigate('/organization')
     }
@@ -66,12 +66,13 @@ const LoginPage = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('auth');
+    const tenant_id = urlParams.get('tenant');
     // console.log(urlParams, token)
 
     if (token) {
       console.log("setting");
       localStorage.setItem('token', token);
-      redirectIfRequire()
+      redirectIfRequire(tenant_id)
     }
   }, [])
 

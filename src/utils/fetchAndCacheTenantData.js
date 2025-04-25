@@ -2,7 +2,7 @@
 import { queryClient } from './reactQuery';
 import api from '../api/';
 
-export const fetchAndCacheTenantData = async () => {
+export const fetchAndCacheTenantData = async (tenantId) => {
   const [orgs, projects, models, admins] = await Promise.all([
     api.get(`/org/getAll`),
     api.get(`/project/getAll`),
@@ -12,10 +12,7 @@ export const fetchAndCacheTenantData = async () => {
 
   console.log(orgs, projects, models, admins)
 
-  const dataFetched_At = new Date().toISOString();
-
-  queryClient.setQueryData(['tenantId']);
-  queryClient.setQueryData(['dataFetched_At']);
+  queryClient.setQueryData(['tenantId'], tenantId);
 
   if (orgs.status === 200) queryClient.setQueryData(['organizations'], orgs.data.orgs);
   else if (orgs.status === 204) queryClient.setQueryData(['organizations'], []);
