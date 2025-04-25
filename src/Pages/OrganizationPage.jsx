@@ -15,6 +15,7 @@ import Button from "../Components/Button";
 import { IoMdClose } from "react-icons/io";
 import { useAddOrganizations } from "../hooks/useAddOrganizations";
 import { queryClient } from "../utils/reactQuery";
+import api from "../api";
 
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,40 +26,42 @@ const OrganizationPage = () => {
   const [parentOrg, setParentOrg] = useState("");
 
   const { data: tenantId } = useQuery({
-    queryKey: ['tenantId'],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['tenantId']),  // retrieving data from cache
+    queryKey: ['tenantId'],
+    queryFn: () => queryClient.getQueryData(['tenantId']),
   });
   const { data: organizations, isLoading: orgLoading, isError: orgError } = useQuery({
-    queryKey: ['organizations', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['organizations', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
+    queryKey: ['organizations', tenantId],
+    queryFn: async () => {
+      const res = await api.get(`/org/getAll`);
+      return res.data.orgs;
+    },
+    enabled: !!tenantId
   });
   const { data: admins, isLoading: adminLoading, isError: adminError } = useQuery({
-    queryKey: ['admins', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['admins', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
+    queryKey: ['admins', tenantId],
+    queryFn: async () => {
+      const res = await api.get(`/admin/getAll`);
+      return res.data.admins;
+    },
+    enabled: !!tenantId
   });
   const { data: projects, isLoading: projectLoading, isError: projectError } = useQuery({
-    queryKey: ['projects', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['projects', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
-  });
-  const { data: models, isLoading: modelLoading, isError: modelError, error } = useQuery({
-    queryKey: ['models', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['models', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
+    queryKey: ['projects', tenantId],
+    queryFn: async () => {
+      const res = await api.get(`/project/getAll`);
+      return res.data.projects;
+    },
+    enabled: !!tenantId
   });
   const { mutate: addOrg, isLoading: addingLoader, isSuccess, isError, status } = useAddOrganizations(tenantId);
 
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log(organizations, admins, projects, models)
-    if (organizations === undefined || admins === undefined || projects === undefined || models === undefined) {
+    if (organizations === undefined || admins === undefined || projects === undefined) {
       navigate("/");
     }
   }, [])
-
 
   const groupAdmins = () => {
     return admins && admins?.reduce((grouped, admin) => {
@@ -156,7 +159,7 @@ const OrganizationPage = () => {
                     </div>
                   </div>
                 </div>
-                <OrganizationTable data={organizations} projectData={groupProjects()} adminData={groupAdmins()} />
+                <OrganizationTable data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
               </div>
             </Body>
           </div>

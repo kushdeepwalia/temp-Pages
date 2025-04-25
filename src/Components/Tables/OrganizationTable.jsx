@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 // Icons:
 import { FaRegEdit } from "react-icons/fa";
@@ -15,11 +15,15 @@ const OrganizationTable = (props) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [paginatedData, setPaginatedData] = useState(props.data?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
 
-  const filterData = (word) => {
+  const filterData = (word = "") => {
     // Get the filtered Data
     setFilterWord(word?.toLowerCase())
     setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(filterWord)))
   }
+
+  useEffect(() => {
+    setFilteredData(props.data)
+  }, [props.data])
 
   useEffect(() => {
     if (filterWord) {
@@ -32,7 +36,7 @@ const OrganizationTable = (props) => {
 
   useEffect(() => {
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
-  }, [currentPage])
+  }, [currentPage, filteredData])
 
   return <>
     <div>

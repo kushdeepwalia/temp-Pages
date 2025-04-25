@@ -12,7 +12,10 @@ export const fetchAndCacheTenantData = async (tenantId) => {
 
   console.log(orgs, projects, models, admins)
 
+  const dataFetched_At = new Date().toISOString();
+
   queryClient.setQueryData(['tenantId'], tenantId);
+  queryClient.setQueryData(['dataFetched_At']);
 
   if (orgs.status === 200) queryClient.setQueryData(['organizations', tenantId], orgs.data.orgs);
   else if (orgs.status === 204) queryClient.setQueryData(['organizations', tenantId], []);

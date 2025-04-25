@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminTable from "../Components/Tables/AdminTable";
 import Body from "../Components/Body";
 import Header from "../Components/Header";
@@ -7,46 +7,85 @@ import { FaPlus } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 import { useQuery } from "@tanstack/react-query";
 import { IoMdClose } from "react-icons/io";
+import RandExp from 'randexp';
+import { useAddAdmins } from "../hooks/useAddAdmins";
+import api from "../api";
+import { useNavigate } from "react-router-dom";
 
 const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [password] = useState(Math.random().toString(36).slice(-8));
+  const [password, setPassword] = useState("");
   const [org, setOrg] = useState("");
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
 
   const { data: tenantId } = useQuery({
-    queryKey: ['tenantId'],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['tenantId']),  // retrieving data from cache
+    queryKey: ['tenantId'],
+    queryFn: () => queryClient.getQueryData(['tenantId']),
   });
   const { data: admins, isLoading: adminLoading, } = useQuery({
-    queryKey: ['admins', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['admins', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
+    queryKey: ['admins', tenantId],
+    queryFn: async () => {
+      const res = await api.get(`/admin/getAll`);
+      return res.data.admins;
+    },
+    enabled: !!tenantId
   });
   const { data: orgOptions, isLoading: orgLoading, isError: orgError } = useQuery({
-    queryKey: ['organizations', tenantId],  // same key used for setQueryData
-    queryFn: () => queryClient.getQueryData(['organizations', tenantId]),  // retrieving data from cache
-    enabled: !!tenantId // only enable the query if tenantId exists
+    queryKey: ['organizations', tenantId],
+    queryFn: async () => {
+      const res = await api.get(`/org/getAll`);
+      return res.data.orgs;
+    },
+    enabled: !!tenantId
   });
+
+  const { mutate: addAdmin, isLoading: addingLoader, isSuccess, isError, status } = useAddAdmins(tenantId);
+
+  const generatePassword = () => {
+    const pass = new RandExp(passwordRegex).gen();
+    console.log(pass);
+    setPassword(pass);
+  };
 
   const resetForm = () => {
     setName("");
     setEmail("");
     setPhone("");
     setOrg("");
+    setPassword("")
   };
 
   const handleSubmit = () => {
-    if (!name || !email || !phone || !org) {
+    console.log(org)
+    if (!name || !email || !phone || !org || !password) {
       alert("Please fill all required fields.");
       return;
     }
-    setAdmins((prev) => [...prev, { Name: name, Email: email, Phone: phone, Status: true }]);
+
+    const newAdmin = {
+      name,
+      email,
+      phone_no: phone,
+      tenant_id: org,
+      pass: password
+    }
+
+    addAdmin(newAdmin)
+
     resetForm();
     setIsModalOpen(false);
   };
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (orgOptions === undefined || admins === undefined) {
+      navigate("/");
+    }
+  }, [])
 
   return (
     <>
@@ -65,7 +104,7 @@ const AdminPage = () => {
                 </div>
               </div>
             </div>
-            <AdminTable data={admins} />
+            <AdminTable data={admins || []} />
           </div>
         </Body>
       </div>
@@ -73,7 +112,7 @@ const AdminPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[400px] relative">
-            <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => setIsModalOpen(false)}>
+            <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => { resetForm(); setIsModalOpen(false) }}>
               <IoMdClose size={24} />
             </button>
 
@@ -89,19 +128,22 @@ const AdminPage = () => {
             <input className="border w-full p-2 mb-4" value={phone} onChange={(e) => setPhone(e.target.value)} />
 
             <label className="block mb-2">Password</label>
-            <input className="border w-full p-2 mb-4 bg-gray-100" value={password} readOnly />
+            <div className="flex mb-4">
+              <input type="password" className="border w-4/5 p-2" value={password} readOnly />
+              <button className="bg-blue-600 ml-2 cursor-pointer text-white px-4 rounded" onClick={generatePassword}>Generate</button>
+            </div>
 
             <label className="block mb-2">Organisation</label>
             <select className="border w-full p-2 mb-4" value={org} onChange={(e) => setOrg(e.target.value)}>
               <option value="">Select Organisation</option>
               {orgOptions.map((o, i) => (
-                <option key={i} value={o}>{o.org_name}</option>
+                <option key={i} value={o.tenant_id}>{o.org_name}</option>
               ))}
             </select>
 
             <div className="flex justify-end gap-4">
               <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>Submit</button>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>{addingLoader ? 'Adding...' : 'Add'}</button>
             </div>
           </div>
         </div>
