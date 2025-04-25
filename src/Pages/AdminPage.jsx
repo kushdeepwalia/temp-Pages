@@ -26,7 +26,7 @@ const AdminPage = () => {
     queryFn: () => queryClient.getQueryData(['tenantId']),
   });
   const { data: admins, isLoading: adminLoading, } = useQuery({
-    queryKey: ['admins', tenantId],
+    queryKey: ['admins'],
     queryFn: async () => {
       const res = await api.get(`/admin/getAll`);
       return res.data.admins;
@@ -34,7 +34,7 @@ const AdminPage = () => {
     enabled: !!tenantId
   });
   const { data: orgOptions, isLoading: orgLoading, isError: orgError } = useQuery({
-    queryKey: ['organizations', tenantId],
+    queryKey: ['organizations'],
     queryFn: async () => {
       const res = await api.get(`/org/getAll`);
       return res.data.orgs;

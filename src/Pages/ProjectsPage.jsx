@@ -26,7 +26,7 @@ const ProjectPage = () => {
     queryFn: () => queryClient.getQueryData(['tenantId']),
   });
   const { data: projects, isLoading: projectLoading, } = useQuery({
-    queryKey: ['projects', tenantId],
+    queryKey: ['projects'],
     queryFn: async () => {
       const res = await api.get(`/project/getAll`);
       return res.data.projects;
@@ -34,7 +34,7 @@ const ProjectPage = () => {
     enabled: !!tenantId
   });
   const { data: orgOptions, isLoading: orgLoading, isError: orgError } = useQuery({
-    queryKey: ['organizations', tenantId],
+    queryKey: ['organizations'],
     queryFn: async () => {
       const res = await api.get(`/org/getAll`);
       return res.data.orgs;

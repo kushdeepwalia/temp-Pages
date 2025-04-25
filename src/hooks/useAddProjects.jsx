@@ -9,9 +9,9 @@ export const useAddProjects = (tenantId) => {
     onSuccess: async () => {
       console.log("success");
       await queryClient.invalidateQueries({
-        queryKey: ['projects', tenantId]
+        queryKey: ['projects']
       });
-      const state = queryClient.getQueryState(['projects', tenantId]);
+      const state = queryClient.getQueryState(['projects']);
       console.log('Query state:', state);
     },
   });

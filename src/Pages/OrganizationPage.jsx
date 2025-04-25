@@ -30,7 +30,7 @@ const OrganizationPage = () => {
     queryFn: () => queryClient.getQueryData(['tenantId']),
   });
   const { data: organizations, isLoading: orgLoading, isError: orgError } = useQuery({
-    queryKey: ['organizations', tenantId],
+    queryKey: ['organizations'],
     queryFn: async () => {
       const res = await api.get(`/org/getAll`);
       return res.data.orgs;
@@ -38,7 +38,7 @@ const OrganizationPage = () => {
     enabled: !!tenantId
   });
   const { data: admins, isLoading: adminLoading, isError: adminError } = useQuery({
-    queryKey: ['admins', tenantId],
+    queryKey: ['admins'],
     queryFn: async () => {
       const res = await api.get(`/admin/getAll`);
       return res.data.admins;
@@ -46,7 +46,7 @@ const OrganizationPage = () => {
     enabled: !!tenantId
   });
   const { data: projects, isLoading: projectLoading, isError: projectError } = useQuery({
-    queryKey: ['projects', tenantId],
+    queryKey: ['projects'],
     queryFn: async () => {
       const res = await api.get(`/project/getAll`);
       return res.data.projects;

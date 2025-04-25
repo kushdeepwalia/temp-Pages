@@ -45,11 +45,11 @@ const LoginPage = () => {
     const res = await api.post("/auth/login", { method: "credentials", email, pass: password });
     if (res.status === 200) {
       const { data } = res;
-      const { user, token } = data;
+      const { token } = data;
       localStorage.setItem('token', token);
 
       // Prefetch everything
-      await fetchAndCacheTenantData(user.tenant_id);
+      await fetchAndCacheTenantData();
 
       navigate('/organization')
     }

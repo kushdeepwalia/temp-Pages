@@ -8,10 +8,10 @@ export const useAddAdmins = (tenantId) => {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['admins', tenantId]
+        queryKey: ['admins']
       });
 
-      const state = queryClient.getQueryState(['admins', tenantId]);
+      const state = queryClient.getQueryState(['admins']);
       console.log('Query state:', state);
     },
   });
