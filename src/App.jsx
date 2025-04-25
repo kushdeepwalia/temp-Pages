@@ -4,7 +4,7 @@ import OrganizationPage from './Pages/OrganizationPage';
 import AdminPage from './Pages/AdminPage';
 import ProjectPage from './Pages/ProjectsPage';
 import LogsPage from './Pages/LogsPage';
-import ModelsPage from './Pages/ModelsPage';
+import ModelsPage from './Pages/ModelUploadForm';
 
 function App() {
 

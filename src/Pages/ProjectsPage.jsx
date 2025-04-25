@@ -17,7 +17,7 @@ const ProjectPage = () => {
 
   const [projects, setProjects] = useState([
     { Name: "Project 1" },
-    { Name: "Project 2" }
+    { Name: "Project 2" },
   ]);
 
   const [orgOptions] = useState(["Org A", "Org B", "Org C"]);
@@ -31,9 +31,7 @@ const ProjectPage = () => {
 
   const handleOutputChange = (value) => {
     setOutputTypes((prev) =>
-      prev.includes(value)
-        ? prev.filter((v) => v !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
   };
 
@@ -58,7 +56,10 @@ const ProjectPage = () => {
               <h2>Project</h2>
               <div className="flex gap-4 items-center">
                 <TfiReload className="hover:cursor-pointer" />
-                <div className="flex items-center cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                <div
+                  className="flex items-center cursor-pointer"
+                  onClick={() => setIsModalOpen(true)}
+                >
                   <p className="pr-1">Add</p>
                   <FaPlus />
                 </div>
@@ -72,26 +73,39 @@ const ProjectPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[400px] relative">
-            <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => setIsModalOpen(false)}>
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+              onClick={() => setIsModalOpen(false)}
+            >
               <IoMdClose size={24} />
             </button>
 
             <h2 className="text-xl font-bold mb-4">Add Project</h2>
 
             <label className="block mb-2">Project Name</label>
-            <input className="border w-full p-2 mb-4" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+            <input
+              className="border w-full p-2 mb-4"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+            />
 
             <label className="block mb-2">Organisation</label>
-            <select className="border w-full p-2 mb-4" value={org} onChange={(e) => setOrg(e.target.value)}>
+            <select
+              className="border w-full p-2 mb-4"
+              value={org}
+              onChange={(e) => setOrg(e.target.value)}
+            >
               <option value="">Select Organisation</option>
               {orgOptions.map((o, i) => (
-                <option key={i} value={o}>{o}</option>
+                <option key={i} value={o}>
+                  {o}
+                </option>
               ))}
             </select>
 
             <label className="block mb-2">Allow Input</label>
             <div className="flex gap-4 mb-4">
-              {['img', 'word'].map((val) => (
+              {["img", "word"].map((val) => (
                 <label key={val}>
                   <input
                     type="radio"
@@ -99,7 +113,8 @@ const ProjectPage = () => {
                     value={val}
                     checked={inputType === val}
                     onChange={(e) => setInputType(e.target.value)}
-                  /> {val.charAt(0).toUpperCase() + val.slice(1)}
+                  />{" "}
+                  {val.charAt(0).toUpperCase() + val.slice(1)}
                 </label>
               ))}
             </div>
@@ -113,14 +128,25 @@ const ProjectPage = () => {
                     value={val}
                     checked={outputTypes.includes(val)}
                     onChange={() => handleOutputChange(val)}
-                  /> {val}
+                  />{" "}
+                  {val}
                 </label>
               ))}
             </div>
 
             <div className="flex justify-end gap-4">
-              <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>Submit</button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded"
+                onClick={resetForm}
+              >
+                Reset
+              </button>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+                onClick={handleSubmit}
+              >
+                Submit
+              </button>
             </div>
           </div>
         </div>
