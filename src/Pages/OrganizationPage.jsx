@@ -7,30 +7,47 @@ import SideBar from "../Components/SideBar"
 import { FaPlus } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const OrganizationPage = () => {
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],  // same key used for setQueryData
     queryFn: () => queryClient.getQueryData(['tenantId']),  // retrieving data from cache
   });
-  const { data: organizations, isLoading: orgLoading, isError } = useQuery({
+  const { data: organizations, isLoading: orgLoading, isError: orgError } = useQuery({
     queryKey: ['organizations', tenantId],  // same key used for setQueryData
     queryFn: () => queryClient.getQueryData(['organizations', tenantId]),  // retrieving data from cache
     enabled: !!tenantId // only enable the query if tenantId exists
   });
-  const { data: admins, isLoading: adminLoading, } = useQuery({
+  const { data: admins, isLoading: adminLoading, isError: adminError } = useQuery({
     queryKey: ['admins', tenantId],  // same key used for setQueryData
     queryFn: () => queryClient.getQueryData(['admins', tenantId]),  // retrieving data from cache
     enabled: !!tenantId // only enable the query if tenantId exists
   });
-  const { data: projects, isLoading: projectLoading, } = useQuery({
+  const { data: projects, isLoading: projectLoading, isError: projectError } = useQuery({
     queryKey: ['projects', tenantId],  // same key used for setQueryData
     queryFn: () => queryClient.getQueryData(['projects', tenantId]),  // retrieving data from cache
     enabled: !!tenantId // only enable the query if tenantId exists
   });
+  const { data: models, isLoading: modelLoading, isError: modelError, error } = useQuery({
+    queryKey: ['models', tenantId],  // same key used for setQueryData
+    queryFn: () => queryClient.getQueryData(['models', tenantId]),  // retrieving data from cache
+    enabled: !!tenantId // only enable the query if tenantId exists
+  });
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log(organizations, admins, projects, models)
+    if (organizations === undefined || admins === undefined || projects === undefined || models === undefined) {
+      navigate("/");
+    }
+  }, [])
+
 
   const groupAdmins = (admins) => {
-    return admins.reduce((grouped, admin) => {
+    return admins && admins?.reduce((grouped, admin) => {
       const { org_name } = admin;
 
       // If the group doesn't exist, create it
@@ -45,7 +62,7 @@ const OrganizationPage = () => {
   };
 
   const groupProjects = (projects) => {
-    return projects.reduce((grouped, project) => {
+    return projects && projects?.reduce((grouped, project) => {
       const { org_name } = project;
 
       // If the group doesn't exist, create it
@@ -62,7 +79,7 @@ const OrganizationPage = () => {
 
   return <>
     {
-      orgLoading || adminLoading || projectLoading ?
+      ((orgLoading || adminLoading || projectLoading) && (!orgError || !adminError || !projectError)) ?
         <></>
         :
         <>

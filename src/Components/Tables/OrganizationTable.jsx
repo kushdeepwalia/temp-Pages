@@ -11,26 +11,27 @@ const OrganizationTable = (props) => {
   const [filteredData, setFilteredData] = useState(props.data)
 
   const [pageSize, setPageSize] = useState(100)
-  const [totalPages, setTotalPage] = useState(Math.ceil(filteredData.length / pageSize))
+  const [totalPages, setTotalPage] = useState(Math.ceil((filteredData?.length || 0) / pageSize))
   const [currentPage, setCurrentPage] = useState(1)
-  const [paginatedData, setPaginatedData] = useState(props.data.slice((currentPage - 1) * pageSize, currentPage * pageSize))
+  const [paginatedData, setPaginatedData] = useState(props.data?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
 
   const filterData = (word) => {
     // Get the filtered Data
     setFilterWord(word?.toLowerCase())
     setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(filterWord)))
   }
+
   useEffect(() => {
     if (filterWord) {
       filterData(filterWord);
     }
     setCurrentPage(1)
-    setTotalPage(Math.ceil(filteredData.length / pageSize))
-    setPaginatedData(props.data.filter(obj => obj.org_name.toLowerCase().includes(filterWord)).slice((currentPage - 1) * pageSize, currentPage * pageSize))
+    setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
+    setPaginatedData(props.data?.filter(obj => obj.org_name.toLowerCase().includes(filterWord))?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [filterWord])
 
   useEffect(() => {
-    setPaginatedData(filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize))
+    setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [currentPage])
 
   return <>
@@ -51,6 +52,9 @@ const OrganizationTable = (props) => {
             <th className="h-12 px-4 text-left align-middle">
               Project
             </th>
+            <th className="h-12 px-4 text-left align-middle">
+              Parent Organization
+            </th>
             {/* <th className="h-12 px-4 text-left align-middle">
               Action
             </th> */}
@@ -60,12 +64,13 @@ const OrganizationTable = (props) => {
           {
             // Mapp obtained data to the table
 
-            paginatedData.map((rowData, i) => (
+            paginatedData?.map((rowData, i) => (
               <tr key={"table-row-" + i}>
                 <td className="h-12 px-4 text-left align-middle">{i + 1}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.adminData[rowData.org_name]?.length || 0}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.projectData[rowData.org_name]?.length || 0}</td>
+                <td className="h-12 px-4 text-left align-middle">{rowData.parent_org_name}</td>
                 {/* <td className="h-12 px-4 text-left align-middle">
                   <div className="flex gap-[8px]">
                     <FaRegEdit className="hover:cursor-pointer" />
