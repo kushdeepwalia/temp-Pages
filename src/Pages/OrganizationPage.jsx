@@ -13,6 +13,8 @@ import { useEffect } from "react";
 import { useState } from "react";
 import Button from "../Components/Button";
 import { IoMdClose } from "react-icons/io";
+import { useAddOrganizations } from "../hooks/useAddOrganizations";
+import { queryClient } from "../utils/reactQuery";
 
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +48,7 @@ const OrganizationPage = () => {
     queryFn: () => queryClient.getQueryData(['models', tenantId]),  // retrieving data from cache
     enabled: !!tenantId // only enable the query if tenantId exists
   });
+  const { mutate: addOrg, isLoading: addingLoader, isSuccess, isError, status } = useAddOrganizations(tenantId);
 
   const navigate = useNavigate()
 
@@ -57,7 +60,7 @@ const OrganizationPage = () => {
   }, [])
 
 
-  const groupAdmins = (admins) => {
+  const groupAdmins = () => {
     return admins && admins?.reduce((grouped, admin) => {
       const { org_name } = admin;
 
@@ -72,7 +75,7 @@ const OrganizationPage = () => {
     }, {});
   };
 
-  const groupProjects = (projects) => {
+  const groupProjects = () => {
     return projects && projects?.reduce((grouped, project) => {
       const { org_name } = project;
 
@@ -117,11 +120,14 @@ const OrganizationPage = () => {
       return;
     }
     const newOrg = {
-      Name: projectName,
-      Admin: "1",
-      Project: outputTypes.length.toString(),
+      name: projectName,
+      allowed_inputs: inputTypes,
+      allowed_outputs: outputTypes,
+      color_theme: selectedColor,
+      parent_tenant_id: parentOrg
     };
-    setOrgs((prev) => [...prev, newOrg]);
+
+    addOrg(newOrg);
     resetForm();
     setIsModalOpen(false);
   };
@@ -167,7 +173,7 @@ const OrganizationPage = () => {
 
                 <h2 className="text-xl font-bold mb-4">Add Organisation</h2>
 
-                <label className="block mb-2">Project Name</label>
+                <label className="block mb-2">Organization Name</label>
                 <input
                   className="border w-full p-2 mb-4"
                   value={projectName}
@@ -175,37 +181,38 @@ const OrganizationPage = () => {
                 />
 
                 <label className="block mb-2">Allow Input</label>
-                <div className="flex gap-4 mb-4">
-                  {['image', 'word'].map((val) => (
-                    <label key={val}>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {['word', 'image'].map((val) => (
+                    <label className="capitalize" key={val}>
                       <input
                         type="checkbox"
                         value={val}
                         checked={inputTypes.includes(val)}
                         onChange={() => handleInputTypeChange(val)}
-                      /> {val.charAt(0).toUpperCase() + val.slice(1)}
+                      /> &nbsp;{val}
                     </label>
                   ))}
                 </div>
 
                 <label className="block mb-2">Allow Output</label>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {["word", "audio", "video", "image", "model"].map((val) => (
+                  {["word", "image", "audio", "video", "model"].map((val) => (
                     <label key={val} className="capitalize">
-                      <input type="checkbox" value={val} checked={outputTypes.includes(val)} onChange={() => handleOutputTypeChange(val)} /> {val}
+                      <input type="checkbox" value={val} checked={outputTypes.includes(val)} onChange={() => handleOutputTypeChange(val.toLowerCase())} /> {val}
                     </label>
                   ))}
                 </div>
 
                 <label className="block mb-2">Select Color</label>
                 <div className="flex gap-4 mb-4">
-                  {["red", "green", "blue", "yellow"].map((color) => (
-                    <div
-                      key={color}
-                      className={`w-8 h-8 rounded-full cursor-pointer border-2 ${selectedColor === color ? "border-black" : "border-transparent"}`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setSelectedColor(color)}
-                    />
+                  {["#ff0000", "#008000", "#0000ff", "#adff2f"].map((color) => (
+                    <div key={color} className={`border-2 rounded-full ${selectedColor === color ? "border-black" : "border-transparent"} p-0.5`}>
+                      <div
+                        className={`w-6 h-6 rounded-full cursor-pointer `}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setSelectedColor(color)}
+                      />
+                    </div>
                   ))}
                 </div>
 
@@ -223,7 +230,7 @@ const OrganizationPage = () => {
 
                 <div className="flex justify-end gap-4">
                   <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>Submit</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
                 </div>
               </div>
             </div>

@@ -62,8 +62,6 @@ const OrganizationTable = (props) => {
         </thead>
         <tbody>
           {
-            // Mapp obtained data to the table
-
             paginatedData?.map((rowData, i) => (
               <tr key={"table-row-" + i}>
                 <td className="h-12 px-4 text-left align-middle">{i + 1}</td>

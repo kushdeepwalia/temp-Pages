@@ -11,6 +11,9 @@ export const queryClient = new QueryClient({
       retry: 2,
     },
     mutations: {
+      onError: (error) => {
+        console.error('Mutation error:', error);
+      },
       retry: 1,                             // Retry once for POST/PUT
     },
   },
