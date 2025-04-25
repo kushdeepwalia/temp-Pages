@@ -4,7 +4,7 @@ import Body from "../Components/Body"
 import Button from "../Components/Button"
 
 import iitLogo from '../assets/IITLogo.svg'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import api from '../api'
 import { fetchAndCacheTenantData } from '../utils/fetchAndCacheTenantData'
 
@@ -57,10 +57,21 @@ const LoginPage = () => {
       alert("Error")
   }
 
+  const redirectIfRequire = useCallback(async () => {
+    // Prefetch everything
+    await fetchAndCacheTenantData();
+    navigate('/organization')
+  }, [])
+
   useEffect(() => {
-    console.log("getting");
-    if (localStorage.getItem('token')) {
-      navigate('/organization')
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('auth');
+    // console.log(urlParams, token)
+
+    if (token) {
+      console.log("setting");
+      localStorage.setItem('token', token);
+      redirectIfRequire()
     }
   }, [])
 
