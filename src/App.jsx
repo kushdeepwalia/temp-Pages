@@ -11,8 +11,6 @@ import { fetchAndCacheTenantData } from './utils/fetchAndCacheTenantData';
 function App() {
 
   const redirectIfRequire = useCallback(async (token) => {
-    localStorage.setItem('token', token);
-
     // Prefetch everything
     await fetchAndCacheTenantData();
   }, [])
@@ -23,6 +21,7 @@ function App() {
     console.log(urlParams, token)
 
     if (token) {
+      localStorage.setItem('token', token);
       redirectIfRequire(token)
     }
   }, [])
