@@ -87,11 +87,11 @@ const LoginPage = () => {
         <div className="flex flex-col gap-[16px] m-[16px]">
           <div className='flex flex-col'>
             <input id="input-email" name="input-email" type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border-black border-[2px]" />
-            {emailError && <span className='text-sm pl-1 text-red-400'>Error in email *</span>}
+            {emailError && <span className='text-sm pl-1 text-red-400'>Error in email*</span>}
           </div>
           <div className='flex flex-col'>
             <input id="input-password" name="input-password" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="border-black border-[2px]" />
-            {passwordError && <span className='text-sm pl-1 text-red-400'>Error in password * {password}</span>}
+            {passwordError && <span className='text-sm pl-1 text-red-400'>Error in password*</span>}
           </div>
         </div>
         <Button onClick={loginBtnClick}>Login</Button>
