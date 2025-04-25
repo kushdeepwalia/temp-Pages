@@ -22,6 +22,7 @@ const OrganizationTable = (props) => {
   }
 
   useEffect(() => {
+    console.log(props.data);
     setFilteredData(props.data)
   }, [props.data])
 
@@ -35,6 +36,7 @@ const OrganizationTable = (props) => {
   }, [filterWord])
 
   useEffect(() => {
+    console.log(filteredData);
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [currentPage, filteredData])
 

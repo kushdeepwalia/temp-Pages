@@ -5,28 +5,8 @@ import AdminPage from './Pages/AdminPage';
 import ProjectPage from './Pages/ProjectsPage';
 import LogsPage from './Pages/LogsPage';
 import ModelsPage from './Pages/ModelsPage';
-import { useCallback, useEffect } from 'react';
-import { fetchAndCacheTenantData } from './utils/fetchAndCacheTenantData';
 
 function App() {
-
-  const redirectIfRequire = useCallback(async (token) => {
-    // Prefetch everything
-    await fetchAndCacheTenantData();
-  }, [])
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('auth');
-    console.log(urlParams, token)
-
-    if (token) {
-      console.log("setting");
-      localStorage.setItem('token', token);
-      redirectIfRequire(token)
-    }
-  }, [])
-
   return (
     <>
       <BrowserRouter>
