@@ -27,40 +27,28 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "./ui/pagination";
-export interface objectData {
-  project_name: string;
-  object_name:string;
-  file_name: {
-              model:string[];
-              audio:string[];
-              video:string[];
-              text:string[]; 
-            };
-  marker: string;
-  created_on: string;
-  id: string;
-}
+
 const ModelList = () => {
   const navigate = useNavigate();
-  const [models, setModels] = useState<objectData[]>([]);
+  const [models, setModels] = useState([]);
   const [load, setloadingPage] =  useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloads, setDownloads]  = useState(0);
   const [valids, setvalids]  = useState(0);
   const { toast } = useToast();
 
-  const saveToIndexedDB = async (modelName: string, fileBlob: Blob) => {
+  const saveToIndexedDB = async (modelName, fileBlob) => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("ModelStorageDB", 1);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      request.onupgradeneeded = (event: any) => {
+      request.onupgradeneeded = (event) => {
         const db = event.target.result;
         if (!db.objectStoreNames.contains("models")) {
           db.createObjectStore("models", { keyPath: "name" });
         }
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      request.onsuccess = (event:any) => {
+      request.onsuccess = (event) => {
         const db = event.target.result;
         const transaction = db.transaction("models", "readwrite");
         const store = transaction.objectStore("models");
@@ -77,12 +65,12 @@ const ModelList = () => {
       };
   
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      request.onerror = (error: any) => reject(error);
+      request.onerror = (error) => reject(error);
     });
   };
 
 
-  const downloadFile = async(object: objectData) => {
+  const downloadFile = async(object) => {
 
   //   Object.entries(object.file_name).forEach(async([key,fileName]) => {
   //     console.log(fileName)
@@ -248,11 +236,11 @@ const ModelList = () => {
   // }
   }
   const getAllSavedKeys = async () => {
-    return new Promise<string[]>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const request = indexedDB.open("ModelStorageDB", 1);
   
       request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+        const db = (event.target).result;
         const transaction = db.transaction("models", "readonly");
         const store = transaction.objectStore("models");
   
@@ -260,7 +248,7 @@ const ModelList = () => {
   
         keysRequest.onsuccess = () => {
           console.log("Saved Keys:", keysRequest.result);
-          resolve(keysRequest.result as string[]);
+          resolve(keysRequest.result);
         };
   
         keysRequest.onerror = () => {
@@ -299,7 +287,7 @@ const ModelList = () => {
       throw error;
     }
   };
-  const deleteModels = async (id: string) => {
+  const deleteModels = async (id) => {
     try {
 
       const response = await fetch(
@@ -349,15 +337,15 @@ const ModelList = () => {
   
   }, [load]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id) => {
     const updatedModels = models.filter((model) => model.id !== id);
     setModels(updatedModels);
     localStorage.setItem("arModels", JSON.stringify(updatedModels));
     toast({ title: "Model deleted successfully" });
   };
 
-  const handleDeleteupdated = (id: string) => {
-    const deleteObject = async (ids: string) => {
+  const handleDeleteupdated = (id) => {
+    const deleteObject = async (ids) => {
       const response = await deleteModels(ids);
       console.log(response)
     }
@@ -379,7 +367,7 @@ const ModelList = () => {
     });
 
   };
-  const handleEdit = (model: objectData) => {
+  const handleEdit = (model) => {
     navigate("/UploadModels", { state: { editData: model } });
   };
 
