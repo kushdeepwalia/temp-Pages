@@ -15,24 +15,14 @@ import { CheckCircle } from "lucide-react";
 import JSZip from "jszip";
 import { objectData } from "./ModelList";
 // Update the model type
-export interface ModelData {
-  id: number;
-  modelName: string;
-  projectName: string;
-  markerFile: string;
-  markerName: string;
-  fileLinks: string[];
-  fileNames: string[];
-  timestamp: string;
-}
 
 const ModelUploadForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const editData = location.state?.editData as objectData | undefined;
+  const editData = location.state?.editData;
   const [modelName, setModelName] = useState("");
   const [projectName, setProjectName] = useState(editData?.project_name || "");
-  const [markerFile, setMarkerFile] = useState<File | null>(null);
+  const [markerFile, setMarkerFile] = useState(null);
   // const [modelFiles, setModelFiles] = useState<
   //   Array<{ file: File | null; type: string }>
   // >(
@@ -58,7 +48,7 @@ const ModelUploadForm = () => {
   const dropZoneRef = useRef<HTMLDivElement | null>(null);
   const markerDropZoneRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMarkerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMarkerFileChange = (e) => {
     if (e.target.files?.[0]) {
       const file = e.target.files[0];
       setMarkerFile(file);
@@ -168,7 +158,7 @@ const ModelUploadForm = () => {
   //     setModelFiles(newModelFiles);
   //   }
   // };
-  const initiateUpload = async (file: File, type: string) => {
+  const initiateUpload = async (file, type) => {
     try {
       const bodyx = {
         project_name: projectName,
@@ -205,11 +195,11 @@ const ModelUploadForm = () => {
   };
 
   const uploadPart = async (
-    file: File,
+    file,
     partNumber,
     chunk,
     uploadId,
-    type: string
+    type
   ) => {
     const bodyx = {
       project_name: projectName,
@@ -270,7 +260,7 @@ const ModelUploadForm = () => {
     }
   };
 
-  const completeUpload = async (file: File, uploadId, parts, type: string) => {
+  const completeUpload = async (file, uploadId, parts, type) => {
     try {
       console.log("Completing upload with upload ID:", uploadId);
 
@@ -408,16 +398,16 @@ const ModelUploadForm = () => {
   const handleDragOver = (e) => {
     e.preventDefault();
   };
-  const handleMarkerDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleMarkerDragOver = (e) => {
     e.preventDefault();
     markerDropZoneRef.current?.classList.add("border-blue-500");
   };
 
-  const handleMarkerDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleMarkerDragLeave = (e) => {
     markerDropZoneRef.current?.classList.remove("border-blue-500");
   };
 
-  const handleMarkerDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleMarkerDrop = (e) => {
     e.preventDefault();
     if (e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
@@ -436,14 +426,14 @@ const ModelUploadForm = () => {
   //   setModelFiles([...modelFiles, { file: null, type: "" }]);
   // };
 
-  const removeModelFile = (index: number) => {
+  const removeModelFile = (index) => {
     if (modelFiles.length > 1) {
       const newModelFiles = modelFiles.filter((_, i) => i !== index);
       setModelFiles(newModelFiles);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate inputs
@@ -484,7 +474,7 @@ const ModelUploadForm = () => {
       //   localStorage.getItem("arModels") || "[]"
       // );
 
-      const newModel: ModelData = {
+      const newModel = {
         id: Date.now(),
         modelName,
         projectName,
