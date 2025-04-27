@@ -19,14 +19,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../Components/ui/select";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
-} from "./ui/pagination";
+} from "../Components/ui/pagination";
 
 const ModelList = () => {
   const navigate = useNavigate();
