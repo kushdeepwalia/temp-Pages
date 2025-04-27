@@ -13,7 +13,6 @@ import {
 import { useToast } from "../Components/ui/use-toast";
 import { CheckCircle } from "lucide-react";
 import JSZip from "jszip";
-import { objectData } from "./ModelList";
 // Update the model type
 
 const ModelUploadForm = () => {
@@ -45,8 +44,8 @@ const ModelUploadForm = () => {
   });
   const [uploadId, setUploadId] = useState(null);
   const { toast } = useToast();
-  const dropZoneRef = useRef<HTMLDivElement | null>(null);
-  const markerDropZoneRef = useRef<HTMLDivElement | null>(null);
+  const dropZoneRef = useRef(null);
+  const markerDropZoneRef = useRef(null);
 
   const handleMarkerFileChange = (e) => {
     if (e.target.files?.[0]) {

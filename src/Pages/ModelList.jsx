@@ -10,7 +10,6 @@ import {
 import { Button } from "../Components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ModelData } from "./ModelUploadForm";
 import { useToast } from "../Components/ui/use-toast";
 import { Input } from "../Components/ui/input";
 import {
