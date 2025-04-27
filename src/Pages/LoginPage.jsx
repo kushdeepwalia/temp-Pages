@@ -18,7 +18,7 @@ const LoginPage = () => {
     <header className=" h-[68px] flex justify-end items-center pr-[16px]">
         <img src={iitLogo}/>
     </header>
-    <Body>
+    <div className='flex-col justify-items-center content-center h-[calc(100vh_-_68px)] w-[100vw]'>
         <div className='flex flex-col items-center'>
             <div>
                 <h1>Login</h1>
@@ -32,7 +32,7 @@ const LoginPage = () => {
                 loginBtnClick()
             }}>Login</Button>
         </div>
-    </Body>
+    </div>
     </>
 }
 

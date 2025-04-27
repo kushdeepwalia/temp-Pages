@@ -377,11 +377,11 @@ const ModelList = () => {
     );
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white rounded-lg shadow-sm p-6 w-[100%]">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">AR Model List</h2>
         <Button asChild>
-          <Link to="/UploadModels">Add New</Link>
+          <Link to="/model-upload">Add New</Link>
         </Button>
       </div>
       <div className="mb-4">

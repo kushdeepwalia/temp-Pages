@@ -720,7 +720,7 @@ const ModelUploadForm = () => {
 
         <div className="BUTTONS flex justify-end gap-5 pt-4">
           <Button variant="outline" type="button" asChild>
-            <Link to="/">Cancel</Link>
+            <Link to="/model">Cancel</Link>
           </Button>
           <Button type="submit">{editData ? "Update" : "Submit"} Files</Button>
         </div>

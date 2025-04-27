@@ -4,7 +4,8 @@ import OrganizationPage from './Pages/OrganizationPage';
 import AdminPage from './Pages/AdminPage';
 import ProjectPage from './Pages/ProjectsPage';
 import LogsPage from './Pages/LogsPage';
-import ModelsPage from './Pages/ModelUploadForm';
+import ModelsPage from './Pages/ModelsPage';
+import ModelUploadForm from './Pages/ModelUploadForm';
 
 function App() {
 
@@ -18,7 +19,7 @@ function App() {
             <Route path='/project' element={<ProjectPage />} />
             <Route path='/model' element={<ModelsPage />} />
             <Route path='/logs' element={<LogsPage />} />
-
+            <Route path='/model-upload' element={<ModelUploadForm />} />
         </Routes>
     </BrowserRouter>
     </>
