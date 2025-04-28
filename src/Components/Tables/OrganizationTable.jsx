@@ -22,7 +22,6 @@ const OrganizationTable = (props) => {
   }
 
   useEffect(() => {
-    console.log(props.data);
     setFilteredData(props.data)
   }, [props.data])
 
@@ -36,7 +35,6 @@ const OrganizationTable = (props) => {
   }, [filterWord])
 
   useEffect(() => {
-    console.log(filteredData);
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [currentPage, filteredData])
 
@@ -61,9 +59,9 @@ const OrganizationTable = (props) => {
             <th className="h-12 px-4 text-left align-middle">
               Parent Organization
             </th>
-            {/* <th className="h-12 px-4 text-left align-middle">
+            <th className="h-12 px-4 text-left align-middle">
               Action
-            </th> */}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -74,13 +72,18 @@ const OrganizationTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.adminData[rowData.org_name]?.length || 0}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.projectData[rowData.org_name]?.length || 0}</td>
-                <td className="h-12 px-4 text-left align-middle">{rowData.parent_org_name}</td>
-                {/* <td className="h-12 px-4 text-left align-middle">
-                  <div className="flex gap-[8px]">
-                    <FaRegEdit className="hover:cursor-pointer" />
-                    <MdDeleteOutline className="hover:cursor-pointer" />
-                  </div>
-                </td> */}
+                <td className="h-12 px-4 text-left align-middle">{rowData.parent_org_name === null ? "----------" : rowData.parent_org_name}</td>
+                <td className="h-12 px-4 text-left align-middle">
+                  {
+                    Number(rowData.tenant_id) !== 1 ?
+                      <div className="flex gap-[8px]">
+                        <FaRegEdit onClick={() => props.setEditableId(rowData.tenant_id)} className="hover:cursor-pointer" />
+                        <MdDeleteOutline onClick={() => props.handleDelete(rowData.tenant_id)} className="hover:cursor-pointer" />
+                      </div>
+                      :
+                      <></>
+                  }
+                </td>
               </tr>
             ))
           }

@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://manorama.adminportal.anganwaditest.co.in/',
+  baseURL: 'http://localhost:2000/',
+  // baseURL: 'https://manorama.adminportal.anganwaditest.co.in/',
 });
 
 api.interceptors.request.use(config => {

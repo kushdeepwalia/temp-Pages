@@ -8,14 +8,16 @@ import { FaPlus } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useState } from "react";
 import Button from "../Components/Button";
 import { IoMdClose } from "react-icons/io";
-import { useAddOrganizations } from "../hooks/useAddOrganizations";
+import { useAddOrganizations } from "../hooks/organizations/useAddOrganizations";
 import { queryClient } from "../utils/reactQuery";
 import api from "../api";
+import { useDeleteOrganizations } from "../hooks/organizations/useDeleteOrganizations";
+import { useModifyOrganizations } from "../hooks/organizations/useModifyOrganizations";
 
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +26,8 @@ const OrganizationPage = () => {
   const [outputTypes, setOutputTypes] = useState([]);
   const [selectedColor, setSelectedColor] = useState("");
   const [parentOrg, setParentOrg] = useState("");
+  const [editableId, setEditableId] = useState();
+  const [editableData, setEditableData] = useState();
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
@@ -53,7 +57,9 @@ const OrganizationPage = () => {
     },
     enabled: !!tenantId
   });
-  const { mutate: addOrg, isLoading: addingLoader, isSuccess, isError, status } = useAddOrganizations(tenantId);
+  const { mutate: addOrg, isLoading: addingLoader } = useAddOrganizations();
+  const { mutate: deleteOrg, isLoading: deletingLoader } = useDeleteOrganizations();
+  const { mutate: modifyOrg, isLoading: modifyingLoader } = useModifyOrganizations();
 
   const navigate = useNavigate()
 
@@ -109,6 +115,20 @@ const OrganizationPage = () => {
     );
   };
 
+  useEffect(() => {
+    if (editableId) {
+      const selectedOrg = organizations.filter((org) => Number(org.tenant_id) === Number(editableId))[0]
+      console.log(selectedOrg);
+      setProjectName(selectedOrg.org_name);
+      setSelectedColor(selectedOrg.color_theme);
+      setInputTypes(selectedOrg.allowed_inputs.slice(1, selectedOrg.allowed_inputs.length - 1).split(","));
+      setOutputTypes(selectedOrg.allowed_outputs.slice(1, selectedOrg.allowed_outputs.length - 1).split(","));
+      setParentOrg(selectedOrg.parent_tenant_id);
+      setEditableData(selectedOrg);
+      setIsModalOpen(true)
+    }
+  }, [editableId]);
+
   const resetForm = () => {
     setProjectName("");
     setInputTypes([]);
@@ -116,6 +136,35 @@ const OrganizationPage = () => {
     setSelectedColor("");
     setParentOrg("");
   };
+
+  const handleEdit = () => {
+    if (editableId) {
+      if (
+        projectName === editableData.org_name &&
+        (JSON.stringify(inputTypes.sort((a, b) => a - b)) === JSON.stringify(editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1).split(",").sort((a, b) => a - b))) &&
+        (JSON.stringify(outputTypes.sort((a, b) => a - b)) === JSON.stringify(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(",").sort((a, b) => a - b))) &&
+        selectedColor === editableData.color_theme &&
+        parentOrg === editableData.parent_tenant_id
+      ) {
+        alert("No field is modified.");
+        return;
+      }
+
+      const modifiedOrg = {
+        name: projectName,
+        allowed_inputs: inputTypes,
+        allowed_outputs: outputTypes,
+        color_theme: selectedColor,
+        parent_tenant_id: parentOrg
+      };
+
+      modifyOrg({ id: editableId, projectData: modifiedOrg });
+      resetForm();
+      setEditableId();
+      setEditableData();
+      setIsModalOpen(false);
+    }
+  }
 
   const handleSubmit = () => {
     if (!projectName || inputTypes.length === 0 || outputTypes.length === 0 || !selectedColor || !parentOrg) {
@@ -159,7 +208,7 @@ const OrganizationPage = () => {
                     </div>
                   </div>
                 </div>
-                <OrganizationTable data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
+                <OrganizationTable setEditableId={setEditableId} handleEdit={handleEdit} handleDelete={deleteOrg} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
               </div>
             </Body>
           </div>
@@ -233,7 +282,7 @@ const OrganizationPage = () => {
 
                 <div className="flex justify-end gap-4">
                   <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
                 </div>
               </div>
             </div>

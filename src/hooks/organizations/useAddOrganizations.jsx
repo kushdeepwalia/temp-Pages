@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '../utils/reactQuery';
-import api from '../api';
+import { queryClient } from '../../utils/reactQuery';
+import api from '../../api';
 
-export const useAddOrganizations = (tenantId) => {
+export const useAddOrganizations = () => {
   return useMutation({
     mutationFn: projectData => api.post(`/org/register`, projectData),
 
