@@ -44,9 +44,9 @@ const ProjectTable = (props) => {
             <th className="h-12 px-4 text-left align-middle">
               Allowed Outputs
             </th>
-            {/* <th className="h-12 px-4 text-left align-middle">
+            <th className="h-12 px-4 text-left align-middle">
               Action
-            </th> */}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -58,12 +58,12 @@ const ProjectTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.name}</td>
                 <td className="h-12 px-4 text-left align-middle">{arrayToString(rowData.allowed_inputs)}</td>
                 <td className="h-12 px-4 text-left align-middle">{arrayToString(rowData.allowed_outputs)}</td>
-                {/* <td className="h-12 px-4 text-left align-middle">
+                <td className="h-12 px-4 text-left align-middle">
                   <div className="flex gap-[8px]">
                     <FaRegEdit className="hover:cursor-pointer" />
                     <MdDeleteOutline className="hover:cursor-pointer" />
                   </div>
-                </td> */}
+                </td>
               </tr>
             ))
           }
