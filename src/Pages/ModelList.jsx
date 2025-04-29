@@ -26,15 +26,31 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../Components/ui/pagination";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../utils/reactQuery";
+import api from "../api";
 
-const ModelList = () => {
+const ModelList = ({ id, name }) => {
   const navigate = useNavigate();
   const [models, setModels] = useState([]);
   const [load, setloadingPage] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(name);
   const [downloads, setDownloads] = useState(0);
   const [valids, setvalids] = useState(0);
   const { toast } = useToast();
+
+  const { data: tenantId } = useQuery({
+    queryKey: ['tenantId'],
+    queryFn: () => queryClient.getQueryData(['tenantId']),
+  });
+  const { data: projects, isLoading: projectLoading, } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const res = await api.get(`/project/getAll`);
+      return res.data.projects;
+    },
+    enabled: !!tenantId
+  });
 
   const saveToIndexedDB = async (modelName, fileBlob) => {
     return new Promise((resolve, reject) => {
@@ -324,6 +340,13 @@ const ModelList = () => {
       const loading = async () => {
         const data = await getModels();
         console.log(data);
+
+        const uniqueProjectNames = [...new Map(
+          data.map(item => [item.project_name, item])
+        ).values()];
+
+        console.log(uniqueProjectNames)
+
         setModels(data);
         setloadingPage(false);
 
@@ -385,12 +408,18 @@ const ModelList = () => {
         </Button>
       </div>
       <div className="mb-4">
-        <Input
-          placeholder="Search by model or project name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
+        <Select value={searchTerm} onValueChange={setSearchTerm}>
+          <SelectTrigger className="w-96 bg-white shadow-sm  h-10">
+            <SelectValue placeholder="Select a project" />
+          </SelectTrigger>
+          <SelectContent>
+            {
+              projects?.map((pro, index) =>
+                <SelectItem key={index} value={pro.name}>{pro.name}</SelectItem>
+              )
+            }
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="rounded-md border">
@@ -398,7 +427,7 @@ const ModelList = () => {
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Project Name</TableHead>
+              {/* <TableHead>Project Name</TableHead> */}
               <TableHead>Model Name</TableHead>
               <TableHead>Marker File</TableHead>
               <TableHead>Model</TableHead>
@@ -413,7 +442,7 @@ const ModelList = () => {
             {filteredModels.map((model, index) => (
               <TableRow key={model.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{model.project_name}</TableCell>
+                {/* <TableCell>{model.project_name}</TableCell> */}
                 <TableCell>{model.object_name}</TableCell>
                 <TableCell>{model.marker}</TableCell>
                 <TableCell> {model.file_name.model.map((file, idx) => (
@@ -436,13 +465,13 @@ const ModelList = () => {
                 </TableCell>
                 <TableCell>{new Date(model.created_on).toLocaleDateString()}</TableCell>
                 <TableCell className="flex gap-2">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEdit(model)}
                   >
                     <Pencil className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -450,13 +479,13 @@ const ModelList = () => {
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => downloadFile(model)}
                   >
                     <Eye className="h-4 w-4 text-black" />
-                  </Button>
+                  </Button> */}
                 </TableCell>
               </TableRow>
             ))}
