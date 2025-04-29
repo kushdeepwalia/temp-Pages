@@ -214,6 +214,7 @@ const OrganizationPage = () => {
     setIsDeleteModalOpen(false);
     setInputConfirmDeleteWord("");
     setDeleteId("");
+    setOrgName("");
     setInputDeleteConfirm("");
   }
   

@@ -188,6 +188,7 @@ const ProjectPage = () => {
     setIsDeleteModalOpen(false);
     setInputConfirmDeleteWord("");
     setInputDeleteConfirm("");
+    setDeleteModalProjectName("");
     setDeleteId("")
   }
 

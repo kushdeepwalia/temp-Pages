@@ -3,6 +3,7 @@ import { use, useEffect, useState } from "react";
 // Icons:
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
+import Button from "../Button";
 
 const OrganizationTable = (props) => {
 
@@ -10,7 +11,7 @@ const OrganizationTable = (props) => {
   const [filterWord, setFilterWord] = useState("")
   const [filteredData, setFilteredData] = useState(props.data)
 
-  const [pageSize, setPageSize] = useState(100)
+  const [pageSize, setPageSize] = useState(5)
   const [totalPages, setTotalPage] = useState(Math.ceil((filteredData?.length || 0) / pageSize))
   const [currentPage, setCurrentPage] = useState(1)
   const [paginatedData, setPaginatedData] = useState(props.data?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
@@ -33,6 +34,12 @@ const OrganizationTable = (props) => {
     setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
     setPaginatedData(props.data?.filter(obj => obj.org_name.toLowerCase().includes(filterWord))?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [filterWord])
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
+    setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
+  }, [pageSize])
 
   useEffect(() => {
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
@@ -68,7 +75,7 @@ const OrganizationTable = (props) => {
           {
             paginatedData?.map((rowData, i) => (
               <tr key={"table-row-" + i}>
-                <td className="h-12 px-4 text-left align-middle">{i + 1}</td>
+                <td className="h-12 px-4 text-left align-middle">{(i + 1) + (currentPage-1) * pageSize}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.adminData[rowData.org_name]?.length || 0}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.projectData[rowData.org_name]?.length || 0}</td>
@@ -90,9 +97,37 @@ const OrganizationTable = (props) => {
         </tbody>
         <tfoot>
           <tr>
-            {/* <td colSpan='5'>
-                        <p>Curret Page: {currentPage}</p>
-                    </td> */}
+            <td colSpan='5'>
+                <div className="flex justify-evenly gap-4">
+                    <p className="block mb-2">Curret Page: {currentPage}</p>
+                    <p className="block mb-2">total Pages: {totalPages}</p>
+                    <select id="page-size"
+                        value={pageSize}
+                        onChange={(e) => {setPageSize(e.target.value)}}
+                        className="border px-2 py-1 rounded"
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={99999}>All</option>
+                    </select>
+                    <button className={(currentPage === 1) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
+                            disabled={(currentPage === 1)}
+                            onClick={ () => {
+                                setCurrentPage(currentPage-1)
+                            }
+                        }>
+                            {"<"}
+                    </button>
+                    <button className={(currentPage === totalPages) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
+                            disabled={(currentPage === totalPages)}
+                            onClick={ () => {
+                                setCurrentPage(currentPage+1)
+                            }
+                        }>
+                            {">"}
+                    </button>
+                </div>
+            </td>
             {/* <CustomTablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               colSpan={3}

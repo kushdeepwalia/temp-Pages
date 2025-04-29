@@ -9,7 +9,7 @@ const AdminTable = (props) => {
   const [filterWord, setFilterWord] = useState("")
 
   return <>
-    <div>
+    <div className="overflow-x-auto">
       {/* <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { setFilterWord(e.target.value) }} /> */}
       <table>
         <thead>
@@ -25,6 +25,9 @@ const AdminTable = (props) => {
             </th>
             <th className="h-12 px-4 text-left align-middle">
               Phone No.
+            </th>
+            <th className="h-12 px-4 text-left align-middle">
+              Organization
             </th>
             <th className="h-12 px-4 text-left align-middle">
               Status
@@ -43,11 +46,12 @@ const AdminTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.name}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.email}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.phone_no}</td>
+                <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.profile_status}</td>
                 <td className="h-12 px-4 text-left align-middle">
                   <div className="flex gap-[8px]">
                     <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
-                    <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id)} className="hover:cursor-pointer" />
+                    <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
                   </div>
                 </td>
               </tr>

@@ -23,6 +23,12 @@ const AdminPage = () => {
   const [org, setOrg] = useState("");
   const [editableId, setEditableId] = useState();
   const [editableData, setEditableData] = useState();
+//   Modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteModalAdminName, setDeleteModalAdminName] = useState("")
+  const [deleteId, setDeleteId] = useState("");
+  const [inputConfirmDeleteWord, setInputConfirmDeleteWord] = useState("");
+  const [inputDeleteConfirm, setInputDeleteConfirm] = useState("");
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
 
   const { data: tenantId } = useQuery({
@@ -135,6 +141,20 @@ const AdminPage = () => {
     }
   }, [])
 
+  const handleDelete = (id, adminName) => {
+    setIsDeleteModalOpen(true);
+    setDeleteModalAdminName(adminName);
+    setDeleteId(id);
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setInputConfirmDeleteWord("");
+    setInputDeleteConfirm("");
+    setDeleteModalAdminName("");
+    setDeleteId("")
+  }
+
   return (
     <>
       <Header />
@@ -152,7 +172,7 @@ const AdminPage = () => {
                 </div>
               </div>
             </div>
-            <AdminTable setEditableId={setEditableId} handleDelete={deleteAdmin} data={admins || []} />
+            <AdminTable setEditableId={setEditableId} handleDelete={handleDelete} data={admins || []} />
           </div>
         </Body>
       </div>
@@ -196,6 +216,48 @@ const AdminPage = () => {
           </div>
         </div>
       )}
+        {isDeleteModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-lg w-[400px] relative">
+
+                    <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
+                        onClick={() => closeDeleteModal()}>
+                        <IoMdClose size={24} />
+                    </button>
+
+                    <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
+
+                    <label className="block mb-2">Enter "{deleteModalAdminName}" to Confirm</label>
+                    <input
+                        className="border w-full p-2 mb-4"
+                        value={inputConfirmDeleteWord}
+                        onChange={(e) => setInputConfirmDeleteWord(e.target.value)}
+                    />
+                    
+                    <label className="block mb-2">Enter "delete" to Confirm</label>
+                    <input
+                        className="border w-full p-2 mb-4"
+                        value={inputDeleteConfirm}
+                        onChange={(e) => setInputDeleteConfirm(e.target.value)}
+                    />
+
+                    <div className="flex justify-between gap-4">
+                        <button className={(inputDeleteConfirm === "delete" && inputConfirmDeleteWord === deleteModalAdminName) ? "bg-red-400 text-white px-4 py-2 rounded hover:cursor-pointer" : "bg-gray-300 px-4 py-2 rounded"}
+                            disabled={!(inputDeleteConfirm === "delete" && inputConfirmDeleteWord === deleteModalAdminName)}
+                            onClick={ () => {
+                                deleteAdmin(deleteId);
+                                closeDeleteModal();
+                            }
+                        }>
+                            Delete
+                        </button>
+                        <button className="bg-gray-300 px-4 py-2 rounded hover:cursor-pointer" onClick={() => {closeDeleteModal()}}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
     </>
   );
 };
