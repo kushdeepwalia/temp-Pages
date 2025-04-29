@@ -28,7 +28,7 @@ const Header = () => {
       <div className='relative'>
         <FaUserCircle size={30} className='hover:cursor-pointer' onClick={() => toogleOptions()} />
         <div className={'absolute w-[150px] top-9 right-1 bg-white border-2 flex flex-col items-center ' + (showOptions ? "" : "hidden")}>
-          <div className='hover:cursor-pointer py-1 border-b-[1px] border-black w-full text-center'>Profile</div>
+          {/* <div className='hover:cursor-pointer py-1 border-b-[1px] border-black w-full text-center'>Profile</div> */}
           {/* <hr className='w-full h-1' /> */}
           <div className='hover:cursor-pointer py-1 border-t-[1px] border-black w-full text-center' onClick={logOut}>Log out</div>
         </div>
