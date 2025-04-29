@@ -33,7 +33,7 @@ const ProjectTable = (props) => {
   }
 
   return <>
-    <div>
+    <div className="overflow-auto">
       {/* <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { setFilterWord(e.target.value) }} /> */}
       <table>
         <thead>

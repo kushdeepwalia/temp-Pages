@@ -9,7 +9,7 @@ const AdminTable = (props) => {
   const [filterWord, setFilterWord] = useState("")
 
   return <>
-    <div className="overflow-x-auto">
+    <div className="overflow-auto">
       {/* <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { setFilterWord(e.target.value) }} /> */}
       <table>
         <thead>
