@@ -105,6 +105,7 @@ const LoginPage = () => {
 
     if (token) {
       console.log("setting");
+      console.log(tenant_id, typeof tenant_id);
       localStorage.setItem('token', token);
       localStorage.setItem('tenantId', tenant_id);
     //   redirectIfRequire(tenant_id)
