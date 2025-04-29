@@ -3,10 +3,12 @@ import { useState } from "react";
 // Icons:
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const ProjectTable = (props) => {
 
   const [filterWord, setFilterWord] = useState("")
+  const navigate = useNavigate();
 
   const arrayToString = (arr = "") => {
     const str = arr.slice(1, arr.length - 1);
@@ -24,6 +26,10 @@ const ProjectTable = (props) => {
     }
 
     return finalString;
+  }
+
+  const viewModels = (id, name) => {
+    navigate(`/project/models`, { state: { name, id } })
   }
 
   return <>
@@ -65,6 +71,7 @@ const ProjectTable = (props) => {
                         <div className="flex gap-[8px]">
                           <FaRegEdit onClick={() => props.setEditableId(rowData.id)} className="hover:cursor-pointer" />
                           <MdDeleteOutline onClick={() => props.handleDelete(rowData.id)} className="hover:cursor-pointer" />
+                          <span className="w-10 h-5 bg-red-100 cursor-pointer" onClick={() => viewModels(rowData.id, rowData.name)}></span>
                         </div>
                       </>
                       :

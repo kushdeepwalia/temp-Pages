@@ -16,7 +16,7 @@ function App() {
           <Route path='/organization' element={<OrganizationPage />} />
           <Route path='/admin' element={<AdminPage />} />
           <Route path='/project' element={<ProjectPage />} />
-          <Route path='/model' element={<ModelsPage />} />
+          <Route path='/project/models' element={<ModelsPage />} />
           <Route path='/logs' element={<LogsPage />} />
           <Route path='/model-upload' element={<ModelUploadForm />} />
 
