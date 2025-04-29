@@ -59,10 +59,18 @@ const ProjectTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{arrayToString(rowData.allowed_inputs)}</td>
                 <td className="h-12 px-4 text-left align-middle">{arrayToString(rowData.allowed_outputs)}</td>
                 <td className="h-12 px-4 text-left align-middle">
-                  <div className="flex gap-[8px]">
-                    <FaRegEdit className="hover:cursor-pointer" />
-                    <MdDeleteOutline className="hover:cursor-pointer" />
-                  </div>
+                  {
+                    rowData.access_role !== "read" ?
+                      <>
+                        <div className="flex gap-[8px]">
+                          <FaRegEdit onClick={() => props.setEditableId(rowData.id)} className="hover:cursor-pointer" />
+                          <MdDeleteOutline onClick={() => props.handleDelete(rowData.id)} className="hover:cursor-pointer" />
+                        </div>
+                      </>
+                      :
+                      <>
+                      </>
+                  }
                 </td>
               </tr>
             ))

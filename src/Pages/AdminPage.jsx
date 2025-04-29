@@ -8,9 +8,11 @@ import { TfiReload } from "react-icons/tfi";
 import { useQuery } from "@tanstack/react-query";
 import { IoMdClose } from "react-icons/io";
 import RandExp from 'randexp';
-import { useAddAdmins } from "../hooks/useAddAdmins";
+import { useAddAdmins } from "../hooks/admins/useAddAdmins";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
+import { useDeleteAdmins } from "../hooks/admins/useDeleteAdmins";
+import { useModifyAdmins } from "../hooks/admins/useModifyAdmins";
 
 const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +21,8 @@ const AdminPage = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [org, setOrg] = useState("");
+  const [editableId, setEditableId] = useState();
+  const [editableData, setEditableData] = useState();
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
 
   const { data: tenantId } = useQuery({
@@ -43,6 +47,8 @@ const AdminPage = () => {
   });
 
   const { mutate: addAdmin, isLoading: addingLoader, isSuccess, isError, status } = useAddAdmins(tenantId);
+  const { mutate: deleteAdmin, isLoading: deletingLoader } = useDeleteAdmins();
+  const { mutate: modifyAdmin, isLoading: modifyingLoader } = useModifyAdmins();
 
   const generatePassword = () => {
     const pass = new RandExp(passwordRegex).gen();
@@ -57,6 +63,48 @@ const AdminPage = () => {
     setOrg("");
     setPassword("")
   };
+
+  useEffect(() => {
+    if (editableId) {
+      const selectedAdmin = admins.filter((admin) => Number(admin.admin_id) === Number(editableId))[0]
+      setName(selectedAdmin.name);
+      setEmail(selectedAdmin.email);
+      setPhone(selectedAdmin.phone_no);
+      setOrg(selectedAdmin.org_tenant_id);
+      setPassword("noChange")
+      setEditableData(selectedAdmin);
+      setIsModalOpen(true)
+    }
+  }, [editableId]);
+
+  const handleEdit = () => {
+    if (editableId) {
+      if (
+        name === editableData.name &&
+        email === editableData.email &&
+        org === editableData.org_tenant_id &&
+        phone === editableData.phone_no &&
+        password === "noChange"
+      ) {
+        alert("No field is modified.");
+        return;
+      }
+
+      const modifiedAdmin = {
+        name,
+        email,
+        phone_no: phone,
+        tenant_id: org,
+        pass: password
+      };
+
+      modifyAdmin({ id: editableId, projectData: modifiedAdmin });
+      resetForm();
+      setEditableId();
+      setEditableData();
+      setIsModalOpen(false);
+    }
+  }
 
   const handleSubmit = () => {
     console.log(org)
@@ -104,7 +152,7 @@ const AdminPage = () => {
                 </div>
               </div>
             </div>
-            <AdminTable data={admins || []} />
+            <AdminTable setEditableId={setEditableId} handleDelete={deleteAdmin} data={admins || []} />
           </div>
         </Body>
       </div>
@@ -143,7 +191,7 @@ const AdminPage = () => {
 
             <div className="flex justify-end gap-4">
               <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>{addingLoader ? 'Adding...' : 'Add'}</button>
+              <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
             </div>
           </div>
         </div>

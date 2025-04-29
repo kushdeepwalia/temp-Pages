@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '../utils/reactQuery';
-import api from '../api';
+import { queryClient } from '../../utils/reactQuery';
+import api from '../../api';
 
-export const useAddProjects = (tenantId) => {
+export const useDeleteProjects = () => {
   return useMutation({
-    mutationFn: projectData => api.post(`/project/register`, projectData),
+    mutationFn: (id) => api.delete(`/project/delete/${id}`),
 
     onSuccess: async () => {
       console.log("success");

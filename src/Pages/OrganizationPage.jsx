@@ -208,7 +208,7 @@ const OrganizationPage = () => {
                     </div>
                   </div>
                 </div>
-                <OrganizationTable setEditableId={setEditableId} handleEdit={handleEdit} handleDelete={deleteOrg} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
+                <OrganizationTable setEditableId={setEditableId} handleDelete={deleteOrg} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
               </div>
             </Body>
           </div>

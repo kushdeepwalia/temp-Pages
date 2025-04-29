@@ -10,7 +10,9 @@ import { TfiReload } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
-import { useAddProjects } from "../hooks/useAddProjects";
+import { useAddProjects } from "../hooks/projects/useAddProjects";
+import { useDeleteProjects } from "../hooks/projects/useDeleteProjects";
+import { useModifyProjects } from "../hooks/projects/useModifyProjects";
 
 const ProjectPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +21,8 @@ const ProjectPage = () => {
   const [inputType, setInputType] = useState("");
   const [allowedInputType, setAllowedInputType] = useState(["word", "image"]);
   const [allowedOutputTypes, setAllowedOutputTypes] = useState(["word", "audio", "video", "image", "model"]);
+  const [editableId, setEditableId] = useState();
+  const [editableData, setEditableData] = useState();
   const [outputTypes, setOutputTypes] = useState([]);
 
   const { data: tenantId } = useQuery({
@@ -42,6 +46,8 @@ const ProjectPage = () => {
     enabled: !!tenantId
   });
   const { mutate: addProject, isLoading: addingLoader, isSuccess, isError, status } = useAddProjects(tenantId);
+  const { mutate: deleteProject, isLoading: deletingLoader } = useDeleteProjects();
+  const { mutate: modifyProject, isLoading: modifyingLoader } = useModifyProjects();
 
   const navigate = useNavigate()
 
@@ -51,12 +57,6 @@ const ProjectPage = () => {
     }
   }, [])
 
-  const resetForm = () => {
-    setProjectName("");
-    setOrg("");
-    setInputType("");
-    setOutputTypes([]);
-  };
 
   const getAllowedData = (org) => {
     setOrg(org)
@@ -92,13 +92,58 @@ const ProjectPage = () => {
     );
   };
 
+  const resetForm = () => {
+    setProjectName("");
+    setOrg("");
+    setInputType("");
+    setOutputTypes([]);
+  };
+
+  useEffect(() => {
+    if (editableId) {
+      const selectedOrg = projects.filter((pro) => Number(pro.id) === Number(editableId))[0]
+      console.log(selectedOrg);
+      setProjectName(selectedOrg.name);
+      setInputType(selectedOrg.allowed_inputs.slice(1, selectedOrg.allowed_inputs.length - 1));
+      setOutputTypes(selectedOrg.allowed_outputs.slice(1, selectedOrg.allowed_outputs.length - 1).split(","));
+      setOrg(selectedOrg.org_tenant_id);
+      setEditableData(selectedOrg);
+      setIsModalOpen(true)
+    }
+  }, [editableId]);
+
+  const handleEdit = () => {
+    if (editableId) {
+      if (
+        projectName === editableData.name &&
+        (inputType === editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1)) &&
+        (JSON.stringify(outputTypes.sort((a, b) => a - b)) === JSON.stringify(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(",").sort((a, b) => a - b))) &&
+        org === editableData.org_tenant_id
+      ) {
+        alert("No field is modified.");
+        return;
+      }
+
+      const modifiedProject = {
+        name: projectName,
+        allowed_inputs: [inputType],
+        allowed_outputs: outputTypes,
+        tenant_id: org
+      }
+
+      modifyProject({ id: editableId, projectData: modifiedProject });
+      resetForm();
+      setEditableId();
+      setEditableData();
+      setIsModalOpen(false);
+    }
+  }
+
   const handleSubmit = () => {
     if (!projectName || !org || !inputType || outputTypes.length === 0) {
       alert("Please fill all required fields.");
       return;
     }
-
-
     const newProject = {
       name: projectName,
       allowed_inputs: [inputType],
@@ -134,7 +179,7 @@ const ProjectPage = () => {
                     </div>
                   </div>
                 </div>
-                <ProjectTable data={projects || []} />
+                <ProjectTable setEditableId={setEditableId} handleDelete={deleteProject} data={projects || []} />
               </div>
             </Body>
           </div>
@@ -197,7 +242,7 @@ const ProjectPage = () => {
 
                 <div className="flex justify-end gap-4">
                   <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handleSubmit}>Submit</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}>Submit</button>
                 </div>
               </div>
             </div>

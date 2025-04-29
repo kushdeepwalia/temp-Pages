@@ -29,9 +29,9 @@ const AdminTable = (props) => {
             <th className="h-12 px-4 text-left align-middle">
               Status
             </th>
-            {/* <th className="h-12 px-4 text-left align-middle">
+            <th className="h-12 px-4 text-left align-middle">
               Action
-            </th> */}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -44,12 +44,12 @@ const AdminTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.email}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.phone_no}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.profile_status}</td>
-                {/* <td className="h-12 px-4 text-left align-middle">
+                <td className="h-12 px-4 text-left align-middle">
                   <div className="flex gap-[8px]">
-                    <FaRegEdit className="hover:cursor-pointer" />
-                    <MdDeleteOutline className="hover:cursor-pointer" />
+                    <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                    <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id)} className="hover:cursor-pointer" />
                   </div>
-                </td> */}
+                </td>
               </tr>
             ))
           }
