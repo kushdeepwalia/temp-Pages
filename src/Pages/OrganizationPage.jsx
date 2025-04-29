@@ -25,7 +25,7 @@ const OrganizationPage = () => {
   const [deleteId, setDeleteId] = useState();
   const [inputConfirmDeleteWord, setInputConfirmDeleteWord] = useState("");
   const [inputDeleteConfirm, setInputDeleteConfirm] = useState("");
-  const [orgName, setOrgName] = useState("confirm");
+  const [orgName, setOrgName] = useState("");
   const [projectName, setProjectName] = useState("");
   const [inputTypes, setInputTypes] = useState([]);
   const [outputTypes, setOutputTypes] = useState([]);

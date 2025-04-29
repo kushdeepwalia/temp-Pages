@@ -70,7 +70,7 @@ const ProjectTable = (props) => {
                       <>
                         <div className="flex gap-[8px]">
                           <FaRegEdit onClick={() => props.setEditableId(rowData.id)} className="hover:cursor-pointer" />
-                          <MdDeleteOutline onClick={() => props.handleDelete(rowData.id)} className="hover:cursor-pointer" />
+                          <MdDeleteOutline onClick={() => props.handleDelete(rowData.id, rowData.name)} className="hover:cursor-pointer" />
                           <span className="w-10 h-5 bg-red-100 cursor-pointer" onClick={() => viewModels(rowData.id, rowData.name)}></span>
                         </div>
                       </>
