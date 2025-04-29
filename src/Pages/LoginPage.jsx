@@ -69,7 +69,7 @@ const LoginPage = () => {
     if (validateModalPassword(modalPassword)){
         if (modalConfirmPassword === modalPassword){
             // Do stuff i.e. call API and such then close modal
-            const tenantId = localStorage.get("tenantId")
+            const tenantId = localStorage.getItem("tenantId")
             if (tenantId === 1){
                 redirectIfRequire("/organization")
             } else {
