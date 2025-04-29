@@ -78,7 +78,7 @@ const OrganizationTable = (props) => {
                     Number(rowData.tenant_id) !== 1 ?
                       <div className="flex gap-[8px]">
                         <FaRegEdit onClick={() => props.setEditableId(rowData.tenant_id)} className="hover:cursor-pointer" />
-                        <MdDeleteOutline onClick={() => props.handleDelete(rowData.tenant_id)} className="hover:cursor-pointer" />
+                        <MdDeleteOutline onClick={() => props.handleDelete(rowData.tenant_id, rowData.org_name)} className="hover:cursor-pointer" />
                       </div>
                       :
                       <></>

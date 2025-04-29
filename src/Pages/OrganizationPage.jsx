@@ -21,6 +21,11 @@ import { useModifyOrganizations } from "../hooks/organizations/useModifyOrganiza
 
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState();
+  const [inputConfirmDeleteWord, setInputConfirmDeleteWord] = useState("");
+  const [inputDeleteConfirm, setInputDeleteConfirm] = useState("");
+  const [confirmDeleteWord, setConfirmDeleteWord] = useState("confirm");
   const [projectName, setProjectName] = useState("");
   const [inputTypes, setInputTypes] = useState([]);
   const [outputTypes, setOutputTypes] = useState([]);
@@ -184,6 +189,19 @@ const OrganizationPage = () => {
     setIsModalOpen(false);
   };
 
+  const handleDelete = (id, confirmWord) => {
+    setIsDeleteModalOpen(true);
+    setConfirmDeleteWord(confirmWord);
+    setDeleteId(id);
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setInputConfirmDeleteWord("");
+    setDeleteId("");
+    setInputDeleteConfirm("");
+  }
+  
   return <>
     {
       ((orgLoading || adminLoading || projectLoading) && (!orgError || !adminError || !projectError)) ?
@@ -208,7 +226,7 @@ const OrganizationPage = () => {
                     </div>
                   </div>
                 </div>
-                <OrganizationTable setEditableId={setEditableId} handleDelete={deleteOrg} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
+                <OrganizationTable setEditableId={setEditableId} /*handleDelete={deleteOrg}*/ handleDelete={handleDelete} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
               </div>
             </Body>
           </div>
@@ -285,6 +303,48 @@ const OrganizationPage = () => {
                   <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
                 </div>
               </div>
+            </div>
+          )}
+          {isDeleteModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-lg w-[400px] relative">
+
+                    <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
+                        onClick={() => closeDeleteModal()}>
+                        <IoMdClose size={24} />
+                    </button>
+
+                    <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
+
+                    <label className="block mb-2">Enter "{confirmDeleteWord}" to Confirm</label>
+                    <input
+                        className="border w-full p-2 mb-4"
+                        value={inputConfirmDeleteWord}
+                        onChange={(e) => setInputConfirmDeleteWord(e.target.value)}
+                    />
+                    
+                    <label className="block mb-2">Enter "delete" to Confirm</label>
+                    <input
+                        className="border w-full p-2 mb-4"
+                        value={inputDeleteConfirm}
+                        onChange={(e) => setInputDeleteConfirm(e.target.value)}
+                    />
+
+                    <div className="flex justify-between gap-4">
+                        <button className={(inputDeleteConfirm === "delete" && inputConfirmDeleteWord === confirmDeleteWord) ? "bg-red-400 text-white px-4 py-2 rounded hover:cursor-pointer" : "bg-gray-300 px-4 py-2 rounded"}
+                            disabled={!(inputDeleteConfirm === "delete" && inputConfirmDeleteWord === confirmDeleteWord)}
+                            onClick={ () => {
+                                deleteOrg(deleteId);
+                                closeDeleteModal();
+                            }
+                        }>
+                            Delete
+                        </button>
+                        <button className="bg-gray-300 px-4 py-2 rounded hover:cursor-pointer" onClick={() => {closeDeleteModal()}}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
             </div>
           )}
         </>
