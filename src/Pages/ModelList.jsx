@@ -29,6 +29,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../utils/reactQuery";
 import api from "../api";
+import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
 
 const ModelList = ({ id, name }) => {
   const navigate = useNavigate();
@@ -38,6 +39,9 @@ const ModelList = ({ id, name }) => {
   const [downloads, setDownloads] = useState(0);
   const [valids, setvalids] = useState(0);
   const { toast } = useToast();
+//   Modals
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteModalData, setDeleteModalData] = useState({itemName: "", itemId: ""})
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
@@ -51,6 +55,15 @@ const ModelList = ({ id, name }) => {
     },
     enabled: !!tenantId
   });
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setDeleteModalData({itemName: "", itemId: ""})
+  }
+  const deleteButtonClick = (id, name) => {
+    setDeleteModalData({itemName: name, itemId: id});
+    setIsDeleteModalOpen(true)
+  }
 
   const saveToIndexedDB = async (modelName, fileBlob) => {
     return new Promise((resolve, reject) => {
@@ -472,12 +485,19 @@ const ModelList = ({ id, name }) => {
                   >
                     <Pencil className="h-4 w-4" />
                   </Button> */}
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDeleteupdated(model.id)}
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button> */}
+                  <Button className="hover:cursor-pointer"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteButtonClick(model.id, model.object_name)}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500 " />
                   </Button>
                   {/* <Button
                     variant="ghost"
@@ -492,6 +512,7 @@ const ModelList = ({ id, name }) => {
           </TableBody>
         </Table>
       </div>
+      <DeleteConfirmationModal isOpen={isDeleteModalOpen} itemData={deleteModalData} closeModal={closeDeleteModal} deleteItem={handleDeleteupdated}/>
     </div>
   );
 };
