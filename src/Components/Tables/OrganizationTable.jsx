@@ -19,12 +19,13 @@ const OrganizationTable = (props) => {
 
   const filterData = (word = "") => {
     // Get the filtered Data
-    setFilterWord(word?.toLowerCase())
-    setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(word)))
+    setFilterWord(word)
+    setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(word.toLowerCase())))
   }
 
   useEffect(() => {
-    setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
+    const newTotalPages = Math.ceil((filteredData?.length || 0) / pageSize)
+    setTotalPage( newTotalPages ? newTotalPages : 1)
     setCurrentPage(1);
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [filteredData, pageSize])
@@ -89,7 +90,7 @@ const OrganizationTable = (props) => {
                 <div className="flex justify-evenly gap-4 items-center">
                     <p className="block">Entries: {filteredData.length}</p>
                     <p className="block">Curret Page: {currentPage}</p>
-                    <p className="block">total Pages: {totalPages}</p>
+                    <p className="block">total Pages: {totalPages ? totalPages : 1}</p>
                     <select id="page-size"
                         value={pageSize}
                         onChange={(e) => {setPageSize(e.target.value)}}
