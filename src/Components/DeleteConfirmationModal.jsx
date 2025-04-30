@@ -27,14 +27,14 @@ const DeleteConfirmationModal = (props) => {
 
                 <label className="block mb-2">Enter "{props.itemData.itemName}" to Confirm</label>
                 <input
-                    className="border w-full p-2 mb-4"
+                    className="border w-full p-2 mb-4 rounded"
                     value={inputConfirmWord}
                     onChange={(e) => setinputConfirmWord(e.target.value)}
                 />
                 
                 <label className="block mb-2">Enter "delete" to Confirm</label>
                 <input
-                    className="border w-full p-2 mb-4"
+                    className="border w-full p-2 mb-4 rounded"
                     value={inputConfirm}
                     onChange={(e) => setInputConfirm(e.target.value)}
                 />

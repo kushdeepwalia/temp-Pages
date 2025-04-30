@@ -24,6 +24,10 @@ const OrganizationTable = (props) => {
   }
 
   useEffect(() => {
+    setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(filterWord.toLowerCase())))
+  }, [props.data])
+
+  useEffect(() => {
     const newTotalPages = Math.ceil((filteredData?.length || 0) / pageSize)
     setTotalPage( newTotalPages ? newTotalPages : 1)
     setCurrentPage(1);
@@ -36,7 +40,7 @@ const OrganizationTable = (props) => {
 
   return <>
     <div className="overflow-auto">
-      <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { filterData(e.target.value) }} />
+      <input type='text' className="border p-2 m-4 rounded" value={filterWord} placeholder="Search" onChange={(e) => { filterData(e.target.value) }} />
       <table>
         <thead>
           <tr>
