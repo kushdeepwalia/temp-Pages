@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import Button from "../Button";
+import { filter } from "jszip";
 
 const OrganizationTable = (props) => {
 
@@ -19,35 +20,22 @@ const OrganizationTable = (props) => {
   const filterData = (word = "") => {
     // Get the filtered Data
     setFilterWord(word?.toLowerCase())
-    setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(filterWord)))
+    setFilteredData(props.data.filter(obj => obj.org_name.toLowerCase().includes(word)))
   }
 
   useEffect(() => {
-    setFilteredData(props.data)
-  }, [props.data])
-
-  useEffect(() => {
-    if (filterWord) {
-      filterData(filterWord);
-    }
-    setCurrentPage(1)
     setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
-    setPaginatedData(props.data?.filter(obj => obj.org_name.toLowerCase().includes(filterWord))?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
-  }, [filterWord])
-
-  useEffect(() => {
     setCurrentPage(1);
-    setTotalPage(Math.ceil((filteredData?.length || 0) / pageSize))
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
-  }, [pageSize])
+  }, [filteredData, pageSize])
 
   useEffect(() => {
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
-  }, [currentPage, filteredData])
+  }, [currentPage])
 
   return <>
     <div className="overflow-auto">
-      <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { setFilterWord(e.target.value) }} />
+      <input type='text' className="border-b border-2" value={filterWord} placeholder="Search" onChange={(e) => { filterData(e.target.value) }} />
       <table>
         <thead>
           <tr>
@@ -97,10 +85,11 @@ const OrganizationTable = (props) => {
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan='5'>
-                <div className="flex justify-evenly gap-4">
-                    <p className="block mb-2">Curret Page: {currentPage}</p>
-                    <p className="block mb-2">total Pages: {totalPages}</p>
+            <td colSpan='6' className="items-center">
+                <div className="flex justify-evenly gap-4 items-center">
+                    <p className="block">Entries: {filteredData.length}</p>
+                    <p className="block">Curret Page: {currentPage}</p>
+                    <p className="block">total Pages: {totalPages}</p>
                     <select id="page-size"
                         value={pageSize}
                         onChange={(e) => {setPageSize(e.target.value)}}
