@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Icons:
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 
 const AdminTable = (props) => {
-
+  const [userId, setUserId] = useState(-1)
+  const [userEmail, setUserEmail] = useState("")
   const [filterWord, setFilterWord] = useState("")
+
+  useEffect(() => {
+    if (userId === -1) {
+      const user = JSON.parse(localStorage.getItem('user'))
+      setUserId(user.id)
+      setUserEmail(user.email)
+    }
+  }, [userId])
 
   return <>
     <div className="overflow-auto">
@@ -50,8 +59,34 @@ const AdminTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.profile_status}</td>
                 <td className="h-12 px-4 text-left align-middle">
                   <div className="flex gap-[8px]">
-                    <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
-                    <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                    {
+                      userId === "35" ?
+                        <>
+                          <span>user 35</span>
+                          <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                          <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                        </>
+                        :
+                        Number(rowData.org_tenant_id) === 1 ?
+                          userEmail === "mohitdcsa@gmail.com" ?
+                            <>
+                              <span>user email mohit</span>
+                              <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                              <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                            </>
+                            :
+                            rowData.email !== userEmail && rowData.email !== "mohitdcsa@gmail.com" ?
+                              <>
+                                <span>row email not same and not mohit</span>
+                                <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                                <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                              </>
+                              :
+                              <></>
+                          :
+                          <></>
+
+                    }
                   </div>
                 </td>
               </tr>

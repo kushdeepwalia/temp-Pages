@@ -53,6 +53,7 @@ const LoginPage = () => {
       const { data } = res;
       const { user, token } = data;
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
 
       // Prefetch everything
       await fetchAndCacheTenantData(user.tenant_id);
@@ -66,22 +67,22 @@ const LoginPage = () => {
   const handleSetPassword = () => {
     setModalPasswordError(false)
     setModalConfirmPasswordError(false)
-    if (validateModalPassword(modalPassword)){
-        if (modalConfirmPassword === modalPassword){
-            // Do stuff i.e. call API and such then close modal
-            const tenantId = localStorage.getItem("tenantId")
-            console.log(tenantId, typeof tenantId);
-            if (Number(tenantId) === 1){
-                redirectIfRequire("/organization")
-            } else {
-                redirectIfRequire("/project")
-            }
-            setIsModalOpen(false)
+    if (validateModalPassword(modalPassword)) {
+      if (modalConfirmPassword === modalPassword) {
+        // Do stuff i.e. call API and such then close modal
+        const tenantId = localStorage.getItem("tenantId")
+        console.log(tenantId, typeof tenantId);
+        if (Number(tenantId) === 1) {
+          redirectIfRequire("/organization")
         } else {
-            setModalConfirmPasswordError(true);
+          redirectIfRequire("/project")
         }
+        setIsModalOpen(false)
+      } else {
+        setModalConfirmPasswordError(true);
+      }
     } else {
-        setModalPasswordError(true);
+      setModalPasswordError(true);
     }
   }
 
@@ -108,7 +109,7 @@ const LoginPage = () => {
       console.log(tenant_id, typeof tenant_id);
       localStorage.setItem('token', token);
       localStorage.setItem('tenantId', tenant_id);
-    //   redirectIfRequire(tenant_id)
+      //   redirectIfRequire(tenant_id)
       setIsModalOpen(true)
     }
   }, [])
@@ -136,43 +137,43 @@ const LoginPage = () => {
       </div>
     </Body>
     {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg w-[400px] relative">
-                <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
-                    onClick={() => setIsModalOpen(false)}>
-                    <IoMdClose size={24} />
-                </button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg w-[400px] relative">
+          <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
+            onClick={() => setIsModalOpen(false)}>
+            <IoMdClose size={24} />
+          </button>
 
-                <h2 className="text-xl font-bold mb-4">Set Password</h2>
+          <h2 className="text-xl font-bold mb-4">Set Password</h2>
 
-                <label className="block mb-2">Enter Password</label>
-                <input className="border w-full p-2 mb-4"
-                    value={modalPassword}
-                    onChange={(e) => {
-                        setModalPassword(e.target.value)
-                        setModalPasswordError(false)
-                    }}
-                />
-                { modalPasswordError ? <label className="block mb-2 text-red-400">Error: Enter a valid password</label> : <></>}
-                
-                <label className="block mb-2">Confirm Password</label>
-                <input className="border w-full p-2 mb-4"
-                    value={modalConfirmPassword}
-                    onChange={(e) => {
-                        setModalConfirmPassword(e.target.value)
-                        setModalConfirmPasswordError(false)
-                    }}
-                />
-                { modalConfirmPasswordError ? <label className="block mb-2 text-red-400">Error: Incorrect password</label> : <></>}
-                
+          <label className="block mb-2">Enter Password</label>
+          <input className="border w-full p-2 mb-4"
+            value={modalPassword}
+            onChange={(e) => {
+              setModalPassword(e.target.value)
+              setModalPasswordError(false)
+            }}
+          />
+          {modalPasswordError ? <label className="block mb-2 text-red-400">Error: Enter a valid password</label> : <></>}
 
-                <div className='flex w-[100%] justify-end gap-4'>
-                    <button className="bg-green-500 text-white px-4 py-2 rounded hover:cursor-pointer" onClick={() => {handleSetPassword()}}>
-                        Set Password
-                    </button>
-                </div>
-            </div>
+          <label className="block mb-2">Confirm Password</label>
+          <input className="border w-full p-2 mb-4"
+            value={modalConfirmPassword}
+            onChange={(e) => {
+              setModalConfirmPassword(e.target.value)
+              setModalConfirmPasswordError(false)
+            }}
+          />
+          {modalConfirmPasswordError ? <label className="block mb-2 text-red-400">Error: Incorrect password</label> : <></>}
+
+
+          <div className='flex w-[100%] justify-end gap-4'>
+            <button className="bg-green-500 text-white px-4 py-2 rounded hover:cursor-pointer" onClick={() => { handleSetPassword() }}>
+              Set Password
+            </button>
+          </div>
         </div>
+      </div>
     )}
   </>
 }
