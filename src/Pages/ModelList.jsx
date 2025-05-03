@@ -30,7 +30,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../utils/reactQuery";
 import api from "../api";
 
-const ModelList = ({ id, name }) => {
+const ModelList = ({ id = "", name = "" }) => {
   const navigate = useNavigate();
   const [models, setModels] = useState([]);
   const [load, setloadingPage] = useState(true);
@@ -403,8 +403,8 @@ const ModelList = ({ id, name }) => {
     <div className="bg-white rounded-lg shadow-sm p-6 w-[100%]">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">AR Model List</h2>
-        <Button asChild>
-          <Link to="/model-upload">Add New</Link>
+        <Button asChild onClick={() => navigate("/model-upload", {state: {id,name}})}>
+          <span>Add New</span>
         </Button>
       </div>
       <div className="mb-4">
