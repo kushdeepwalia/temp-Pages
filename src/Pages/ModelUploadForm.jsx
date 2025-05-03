@@ -13,14 +13,25 @@ import {
 import { useToast } from "../Components/ui/use-toast";
 import { CheckCircle } from "lucide-react";
 import JSZip from "jszip";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../utils/reactQuery";
+import api from "../api";
 // Update the model type
 
 const ModelUploadForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const editData = location.state?.editData;
+  const name = location.state?.name || undefined;
+  const id = location.state?.id || undefined;
+
+  useEffect(() => {
+    if (!name || !id) {
+      navigate("/project")
+    }
+  }, [])
   const [modelName, setModelName] = useState("");
-  const [projectName, setProjectName] = useState(editData?.project_name || "");
+  const [projectName, setProjectName] = useState(editData?.project_name || name);
   const [markerFile, setMarkerFile] = useState(null);
   // const [modelFiles, setModelFiles] = useState<
   //   Array<{ file: File | null; type: string }>
@@ -46,6 +57,19 @@ const ModelUploadForm = () => {
   const { toast } = useToast();
   const dropZoneRef = useRef(null);
   const markerDropZoneRef = useRef(null);
+
+  const { data: tenantId } = useQuery({
+    queryKey: ['tenantId'],
+    queryFn: () => queryClient.getQueryData(['tenantId']),
+  });
+  const { data: projects, isLoading: projectLoading, } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const res = await api.get(`/project/getAll`);
+      return res.data.projects;
+    },
+    enabled: !!tenantId
+  });
 
   const handleMarkerFileChange = (e) => {
     if (e.target.files?.[0]) {
@@ -157,14 +181,14 @@ const ModelUploadForm = () => {
   //     setModelFiles(newModelFiles);
   //   }
   // };
-  const initiateUpload = async (file, type) => {
+  const initiateUpload = async (file, type, dateNow) => {
     try {
       const bodyx = {
         project_name: projectName,
         object_name: modelName,
-        file_name: file.name,
+        file_name: projectName + "-" + dateNow + "-" + file.name,
         file_type: type,
-      };
+     };
       console.log("Initializing upload with headers:", bodyx);
 
       const response = await fetch(
@@ -198,16 +222,17 @@ const ModelUploadForm = () => {
     partNumber,
     chunk,
     uploadId,
-    type
+    type,
+    dateNow
   ) => {
     const bodyx = {
       project_name: projectName,
       object_name: modelName,
-      file_name: file.name,
+      file_name: projectName + "-" + dateNow + "-" + file.name,
       file_type: type,
       upload_id: uploadId,
       part_number: partNumber,
-    };
+   };
     console.log("Uploading part with headers:", bodyx);
 
     try {
@@ -259,7 +284,7 @@ const ModelUploadForm = () => {
     }
   };
 
-  const completeUpload = async (file, uploadId, parts, type) => {
+  const completeUpload = async (file, uploadId, parts, type, dateNow) => {
     try {
       console.log("Completing upload with upload ID:", uploadId);
 
@@ -273,11 +298,11 @@ const ModelUploadForm = () => {
           body: JSON.stringify({
             project_name: projectName,
             object_name: modelName,
-            file_name: file.name,
+            file_name: projectName + "-" + dateNow + "-" + file.name,
             file_type: type,
             upload_id: uploadId,
             parts,
-          }),
+         }),
         }
       );
 
@@ -292,7 +317,7 @@ const ModelUploadForm = () => {
     }
   };
 
-  const handleUpload = async (file, type) => {
+  const handleUpload = async (file, type, dateNow) => {
     if (!file) {
       console.error("No file selected.");
       return;
@@ -302,7 +327,7 @@ const ModelUploadForm = () => {
       console.log("Starting upload process...");
 
       // Step 1: Initialize upload and get upload ID
-      const uploadId = await initiateUpload(file, type);
+      const uploadId = await initiateUpload(file, type, dateNow);
       console.log("Upload ID:", uploadId);
 
       // Step 2: Split file into chunks and upload each part
@@ -322,7 +347,8 @@ const ModelUploadForm = () => {
               partNumber,
               chunk,
               uploadId,
-              type
+              type,
+              dateNow
             );
             chunks.push(partData);
             break; // Exit retry loop on success
@@ -339,7 +365,7 @@ const ModelUploadForm = () => {
       console.log("All parts uploaded. Parts:", chunks);
 
       // Step 3: Complete the upload
-      await completeUpload(file, uploadId, chunks, type);
+      await completeUpload(file, uploadId, chunks, type, dateNow);
       console.log("Upload process finished successfully!");
     } catch (error) {
       console.error("Upload failed:", error);
@@ -451,16 +477,18 @@ const ModelUploadForm = () => {
     }
 
     try {
+      const name = projectName;
       toast({ title: "Uploading files...", description: "Please wait..." });
+      const dateNow = Date.now();
 
       // Upload marker file
-      await handleUpload(markerFile, "marker");
+      await handleUpload(markerFile, "marker", dateNow);
 
       for (const file in extracted) {
         const value = extracted[file];
         if (value) {
           console.log(file, value);
-          await handleUpload(value, file);
+          await handleUpload(value, file, dateNow);
         }
       }
       // Upload all selected files
@@ -477,8 +505,8 @@ const ModelUploadForm = () => {
         id: Date.now(),
         modelName,
         projectName,
-        markerFile: markerFile.name, // Store file name instead of Blob URL
-        markerName: markerFile.name,
+        markerFile: projectName + "-" + dateNow + "-" + markerFile.name, // Store file name instead of Blob URL
+        markerName: projectName + "-" + dateNow + "-" + markerFile.name,
         fileLinks: Object.values(modelFiles).map((file) =>
           file ? file.name : ""
         ),
@@ -494,9 +522,9 @@ const ModelUploadForm = () => {
       // );
 
       toast({ title: "Success", description: "Model uploaded successfully" });
-
+      console.log()
       // Navigate back after a slight delay to ensure uploads are finished
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate("/project/models", { name, id: projects.filter((project) => project.name === name)[0].id }), 1000);
     } catch (error) {
       console.error("Upload failed:", error);
       toast({
@@ -539,24 +567,18 @@ const ModelUploadForm = () => {
             Project Name
           </label>
           <div className="DropDown">
-            <Select onValueChange={setProjectName}>
+            <Select value={projectName} onValueChange={setProjectName}>
               <SelectTrigger className="w-full bg-white shadow-sm  h-10">
                 <SelectValue placeholder="Select a project" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="CSC">CSC</SelectItem>
-                <SelectItem value="Anganwadi">Anganwadi</SelectItem>
-                <SelectItem value="AWC-AlphabetBook">
-                  AWC-AlphabetBook
-                </SelectItem>
-                <SelectItem value="AWC-VarnmalaBook">
-                  AWC-VarnmalaBook
-                </SelectItem>
-                <SelectItem value="Alphabet">Alphabet</SelectItem>
-                <SelectItem value="Varnmala">Varnmala</SelectItem>
-                <SelectItem value="ARAnimal">AR Animal</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
-
+                {
+                  projects && projects?.map((project, index) => (
+                    <SelectItem key={index} value={project.name}>
+                      {project.name}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
 
@@ -719,8 +741,8 @@ const ModelUploadForm = () => {
         </div>
 
         <div className="BUTTONS flex justify-end gap-5 pt-4">
-          <Button variant="outline" type="button" asChild>
-            <Link to="/model">Cancel</Link>
+          <Button onClick={() => navigate("/project/models", { state: { name: projectName, id: projects.filter((project) => project.name === projectName)[0].id } })} variant="outline" type="button" asChild>
+            <span>Cancel</span>
           </Button>
           <Button type="submit">{editData ? "Update" : "Submit"} Files</Button>
         </div>
@@ -730,3 +752,5 @@ const ModelUploadForm = () => {
 };
 
 export default ModelUploadForm;
+
+// "Chitrakatha" "ARAnimal"
