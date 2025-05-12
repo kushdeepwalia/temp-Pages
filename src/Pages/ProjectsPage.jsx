@@ -25,9 +25,9 @@ const ProjectPage = () => {
   const [editableId, setEditableId] = useState();
   const [editableData, setEditableData] = useState();
   const [outputTypes, setOutputTypes] = useState([]);
-//   Modals
+  //   Modals
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteModalData, setDeleteModalData] = useState({itemName: "",itemId: ""})
+  const [deleteModalData, setDeleteModalData] = useState({ itemName: "", itemId: "" })
   const [isCannotDeleteModalOpen, setIsCannotDeleteModalOpen] = useState(false)
   const [modalTimer, setModalTimer] = useState()
 
@@ -164,25 +164,25 @@ const ProjectPage = () => {
   };
 
   const handleDelete = (id, projName) => {
-    setDeleteModalData({itemName: projName, itemId: id})
-    if (false){
-        console.log("Cannot delete")
-        setIsCannotDeleteModalOpen(true);
-        if (modalTimer){
-            clearTimeout(modalTimer)
-        }
-        setModalTimer(setTimeout(() => {
-            setDeleteModalData({itemName: "", itemId: ""})
-            setIsCannotDeleteModalOpen(false)
-        }, 5000))
+    setDeleteModalData({ itemName: projName, itemId: id })
+    if (false) {
+      console.log("Cannot delete")
+      setIsCannotDeleteModalOpen(true);
+      if (modalTimer) {
+        clearTimeout(modalTimer)
+      }
+      setModalTimer(setTimeout(() => {
+        setDeleteModalData({ itemName: "", itemId: "" })
+        setIsCannotDeleteModalOpen(false)
+      }, 5000))
     } else {
-        setIsDeleteModalOpen(true);
+      setIsDeleteModalOpen(true);
     }
   }
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setDeleteModalData({itemName: "", itemId: ""});
+    setDeleteModalData({ itemName: "", itemId: "" });
   }
 
   return <>
@@ -215,7 +215,12 @@ const ProjectPage = () => {
           {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-white p-6 rounded-lg w-[400px] relative">
-                <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => setIsModalOpen(false)}>
+                <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => {
+                  resetForm();
+                  setEditableId();
+                  setEditableData();
+                  setIsModalOpen(false);
+                }}>
                   <IoMdClose size={24} />
                 </button>
 
@@ -276,25 +281,25 @@ const ProjectPage = () => {
             </div>
           )}
 
-          <DeleteConfirmationModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal} itemData={deleteModalData} deleteItem={deleteProject}/>
-          
+          <DeleteConfirmationModal isOpen={isDeleteModalOpen} closeModal={closeDeleteModal} itemData={deleteModalData} deleteItem={deleteProject} />
+
           {isCannotDeleteModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <div className="bg-white p-6 rounded-lg w-[400px] relative">
+              <div className="bg-white p-6 rounded-lg w-[400px] relative">
 
-                    <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
-                        onClick={() => {setIsCannotDeleteModalOpen(false); setDeleteModalData({itemName: "", itemId: ""})}}>
-                        <IoMdClose size={24} />
-                    </button>
+                <button className="absolute top-2 right-2 text-gray-600 hover:text-black hover:cursor-pointer"
+                  onClick={() => { setIsCannotDeleteModalOpen(false); setDeleteModalData({ itemName: "", itemId: "" }) }}>
+                  <IoMdClose size={24} />
+                </button>
 
-                    <h2 className="text-xl font-bold mb-4">Cannot Delete.</h2>
-                    <p className="block mb-2">Cannot delete Project {deleteModalData.itemName} because there is modal data for this project.</p>
-                    <div className="flex justify-end gap-4">
-                        <button className="bg-gray-300 px-4 py-2 rounded hover:cursor-pointer" onClick={() => {setIsCannotDeleteModalOpen(false); setDeleteModalData({itemName: "", itemId: ""})}}>
-                            Ok
-                        </button>
-                    </div>
+                <h2 className="text-xl font-bold mb-4">Cannot Delete.</h2>
+                <p className="block mb-2">Cannot delete Project {deleteModalData.itemName} because there is modal data for this project.</p>
+                <div className="flex justify-end gap-4">
+                  <button className="bg-gray-300 px-4 py-2 rounded hover:cursor-pointer" onClick={() => { setIsCannotDeleteModalOpen(false); setDeleteModalData({ itemName: "", itemId: "" }) }}>
+                    Ok
+                  </button>
                 </div>
+              </div>
             </div>
           )}
         </>

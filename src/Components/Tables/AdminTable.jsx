@@ -62,27 +62,15 @@ const AdminTable = (props) => {
                     {
                       userId === "35" ?
                         <>
-                          <span>user 35</span>
                           <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
                           <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
                         </>
                         :
                         Number(rowData.org_tenant_id) === 1 ?
-                          userEmail === "mohitdcsa@gmail.com" ?
-                            <>
-                              <span>user email mohit</span>
-                              <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
-                              <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
-                            </>
-                            :
-                            rowData.email !== userEmail && rowData.email !== "mohitdcsa@gmail.com" ?
-                              <>
-                                <span>row email not same and not mohit</span>
-                                <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
-                                <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
-                              </>
-                              :
-                              <></>
+                          <>
+                            <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                            <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                          </>
                           :
                           <></>
 

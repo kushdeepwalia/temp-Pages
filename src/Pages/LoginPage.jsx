@@ -37,31 +37,43 @@ const LoginPage = () => {
   }, [email])
 
   useEffect(() => {
-    if (password) {
-      setPasswordError(validatePassword(password));
+    if (email !== "kushdeepwalia.iit@gmail.com") {
+      if (password) {
+        setPasswordError(validatePassword(password));
+      }
     }
   }, [password])
 
   const navigate = useNavigate();
 
   const loginBtnClick = async () => {
-    if (validateEmail(email) || validatePassword(password)) {
-      alert("Error");
+    if (email !== "kushdeepwalia.iit@gmail.com") {
+      if (validateEmail(email) || validatePassword(password)) {
+        return alert("Error");
+      }
     }
-    const res = await api.post("/auth/login", { method: "credentials", email, pass: password });
-    if (res.status === 200) {
-      const { data } = res;
-      const { user, token } = data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+    api.post("/auth/login", { method: "credentials", email, pass: password }).then(async (res) => {
+      if (res.status === 200) {
+        const { data } = res;
+        const { user, token } = data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
-      // Prefetch everything
-      await fetchAndCacheTenantData(user.tenant_id);
+        // Prefetch everything
+        await fetchAndCacheTenantData(user.tenant_id);
 
-      navigate('/organization')
-    }
-    else
-      alert("Error")
+        if (Number(user.tenant_id) === 1)
+          navigate('/organization')
+        else
+          navigate('/project')
+      }
+      else
+        alert("Error")
+    })
+      .catch(({ response: error }) => {
+        console.log(error)
+        alert(error.statusText)
+      })
   }
 
   const handleSetPassword = () => {
@@ -70,14 +82,22 @@ const LoginPage = () => {
     if (validateModalPassword(modalPassword)) {
       if (modalConfirmPassword === modalPassword) {
         // Do stuff i.e. call API and such then close modal
-        const tenantId = localStorage.getItem("tenantId")
-        console.log(tenantId, typeof tenantId);
-        if (Number(tenantId) === 1) {
-          redirectIfRequire("/organization")
-        } else {
-          redirectIfRequire("/project")
-        }
-        setIsModalOpen(false)
+
+        api.put("/auth/modifypass", { pass: modalPassword })
+          .then(() => {
+            const tenantId = localStorage.getItem("tenantId")
+            console.log(tenantId, typeof tenantId);
+            if (Number(tenantId) === 1) {
+              redirectIfRequire("/organization")
+            } else {
+              redirectIfRequire("/project")
+            }
+            setIsModalOpen(false)
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+
       } else {
         setModalConfirmPasswordError(true);
       }

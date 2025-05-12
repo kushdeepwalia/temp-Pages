@@ -19,14 +19,15 @@ const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [org, setOrg] = useState("");
   const [editableId, setEditableId] = useState();
   const [editableData, setEditableData] = useState();
-//   Modal
+  //   Modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteModalData, setDeleteModalData] = useState({itemName: "", itemId: ""})
+  const [deleteModalData, setDeleteModalData] = useState({ itemName: "", itemId: "" })
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
 
   const { data: tenantId } = useQuery({
@@ -59,6 +60,22 @@ const AdminPage = () => {
     console.log(pass);
     setPassword(pass);
   };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return !emailRegex.test(email);
+  };
+
+  // const validatePassword = (password) => {
+  //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
+  //   return !passwordRegex.test(password);
+  // };
+
+  useEffect(() => {
+    if (email) {
+      setEmailError(validateEmail(email));
+    }
+  }, [email])
 
   const resetForm = () => {
     setName("");
@@ -116,6 +133,9 @@ const AdminPage = () => {
       alert("Please fill all required fields.");
       return;
     }
+    if (validateEmail(email)) {
+      return alert("Error");
+    }
 
     const newAdmin = {
       name,
@@ -140,13 +160,13 @@ const AdminPage = () => {
   }, [])
 
   const handleDelete = (id, adminName) => {
-    setDeleteModalData({itemName: adminName, itemId: id})
+    setDeleteModalData({ itemName: adminName, itemId: id })
     setIsDeleteModalOpen(true);
   }
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setDeleteModalData({itemName: "", itemId: ""})
+    setDeleteModalData({ itemName: "", itemId: "" })
   }
 
   return (
@@ -174,7 +194,13 @@ const AdminPage = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[400px] relative">
-            <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => { resetForm(); setIsModalOpen(false) }}>
+            <button className="absolute top-2 right-2 text-gray-600 hover:text-black" onClick={() => {
+              resetForm();
+              setEditableId();
+              setEditableData();
+              setIsModalOpen(false);
+            }}
+            >
               <IoMdClose size={24} />
             </button>
 
@@ -211,7 +237,7 @@ const AdminPage = () => {
         </div>
       )}
 
-      <DeleteConfirmationModal isOpen={isDeleteModalOpen} itemData={deleteModalData} closeModal={closeDeleteModal} deleteItem={deleteAdmin}/>
+      <DeleteConfirmationModal isOpen={isDeleteModalOpen} itemData={deleteModalData} closeModal={closeDeleteModal} deleteItem={deleteAdmin} />
     </>
   );
 };
