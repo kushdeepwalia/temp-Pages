@@ -79,14 +79,17 @@ const LoginPage = () => {
   const handleSetPassword = () => {
     setModalPasswordError(false)
     setModalConfirmPasswordError(false)
-    if (validateModalPassword(modalPassword)) {
+    if (validateModalPassword(modalPassword) && validateModalPassword(modalConfirmPassword)) {
       if (modalConfirmPassword === modalPassword) {
-        // Do stuff i.e. call API and such then close modal
 
         api.put("/auth/modifypass", { pass: modalPassword })
-          .then(() => {
+          .then((res) => {
+            const { data } = res;
+            const { user, token } = data;
             const tenantId = localStorage.getItem("tenantId")
             console.log(tenantId, typeof tenantId);
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
             if (Number(tenantId) === 1) {
               redirectIfRequire("/organization")
             } else {

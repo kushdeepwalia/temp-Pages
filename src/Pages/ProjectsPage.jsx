@@ -68,6 +68,7 @@ const ProjectPage = () => {
   const getAllowedData = (org) => {
     setOrg(org)
     if (org) {
+      console.log(orgOptions.filter((o) => o.tenant_id === org))
       const { allowed_inputs, allowed_outputs } = orgOptions.filter((o) => o.tenant_id === org)[0];
       const inputs = allowed_inputs?.slice(1, allowed_inputs?.length - 1);
       const outputs = allowed_outputs?.slice(1, allowed_outputs?.length - 1);
@@ -122,6 +123,7 @@ const ProjectPage = () => {
       setOutputTypes(selectedOrg.allowed_outputs.slice(1, selectedOrg.allowed_outputs.length - 1).split(","));
       setOrg(selectedOrg.org_tenant_id);
       setEditableData(selectedOrg);
+      getAllowedData(selectedOrg.org_tenant_id);
       setIsModalOpen(true)
     }
   }, [editableId]);
@@ -135,6 +137,10 @@ const ProjectPage = () => {
         org === editableData.org_tenant_id
       ) {
         alert("No field is modified.");
+        return;
+      }
+      if (!projectName || !org || !inputType || outputTypes.length === 0) {
+        alert("Please fill all required fields.");
         return;
       }
 
@@ -240,7 +246,11 @@ const ProjectPage = () => {
                 <input className="border w-full p-2 mb-4" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
 
                 <label className="block mb-2">Organisation</label>
-                <select className="border w-full p-2 mb-4" value={org} onChange={(e) => getAllowedData(e.target.value)}>
+                <select className="border w-full p-2 mb-4" value={org} onChange={(e) => {
+                  getAllowedData(e.target.value)
+                  setInputType("");
+                  setOutputTypes([]);
+                }}>
                   <option value="">Select Organisation</option>
                   {orgOptions.map((o, i) => (
                     <option key={i} value={o.tenant_id}>{o.org_name}</option>

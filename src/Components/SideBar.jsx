@@ -7,6 +7,7 @@ const SideBar = (props) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user);
     setTenantId(Number(user.tenant_id));
   }, []);
 
