@@ -8,6 +8,8 @@ import { IoMdClose } from "react-icons/io";
 import { useCallback, useEffect, useState } from 'react'
 import api from '../api'
 import { fetchAndCacheTenantData } from '../utils/fetchAndCacheTenantData'
+import { FaCheck } from "react-icons/fa";
+import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -16,17 +18,16 @@ const LoginPage = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalPassword, setModalPassword] = useState("");
-  const [modalPasswordError, setModalPasswordError] = useState(false);
   const [modalConfirmPassword, setModalConfirmPassword] = useState("");
   const [modalConfirmPasswordError, setModalConfirmPasswordError] = useState(false);
+  const [viewPassword, setViewPassword] = useState(false);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return !emailRegex.test(email);
   };
 
-  const validatePassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
+  const validatePassword = (password, passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/) => {
     return !passwordRegex.test(password);
   };
 
@@ -77,7 +78,6 @@ const LoginPage = () => {
   }
 
   const handleSetPassword = () => {
-    setModalPasswordError(false)
     setModalConfirmPasswordError(false)
     if (validateModalPassword(modalPassword) && validateModalPassword(modalConfirmPassword)) {
       if (modalConfirmPassword === modalPassword) {
@@ -99,13 +99,12 @@ const LoginPage = () => {
           })
           .catch((error) => {
             console.log(error);
+            alert(error.statusText)
           })
 
       } else {
         setModalConfirmPasswordError(true);
       }
-    } else {
-      setModalPasswordError(true);
     }
   }
 
@@ -170,21 +169,52 @@ const LoginPage = () => {
           <h2 className="text-xl font-bold mb-4">Set Password</h2>
 
           <label className="block mb-2">Enter Password</label>
-          <input className="border w-full p-2 mb-4"
-            value={modalPassword}
-            onChange={(e) => {
-              setModalPassword(e.target.value)
-              setModalPasswordError(false)
-            }}
-          />
-          {modalPasswordError ? <label className="block mb-2 text-red-400">Error: Enter a valid password</label> : <></>}
+          <div className='w-full border px-2 flex items-center'>
+            <input className="py-2 w-full outline-none"
+              value={modalPassword}
+              type={viewPassword ? 'text' : 'password'}
+              onChange={(e) => {
+                setModalPassword(e.target.value)
+              }}
+            />
+            {
+              viewPassword ?
+                <LuEyeOff size={24} className="cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />
+                :
+                <LuEye size={24} className="cursor-pointer" onClick={() => setViewPassword(!viewPassword)} />
+            }
+          </div>
+          <div className='mb-4 italic text-sm pl-2 mt-2 text-gray-600'>
+            <div className={`flex items-center ${modalPassword !== "" ? validatePassword(modalPassword, /(?=.*[A-Z])/) ? 'text-red-400' : 'text-green-400' : ""}`}>
+              {validatePassword(modalPassword, /(?=.*[A-Z])/) ? <IoMdClose className={`${modalPassword === "" ? "text-white" : ""}`} /> : <FaCheck className={`${modalPassword === "" ? "text-white" : ""}`} />}
+              <span className='ml-2'>Atleast 1 capitial letter</span>
+            </div>
+            <div className={`flex items-center ${modalPassword !== "" ? validatePassword(modalPassword, /(?=.*[a-z])/) ? 'text-red-400' : 'text-green-400' : ""}`}>
+              {validatePassword(modalPassword, /(?=.*[a-z])/) ? <IoMdClose className={`${modalPassword === "" ? "text-white" : ""}`} /> : <FaCheck className={`${modalPassword === "" ? "text-white" : ""}`} />}
+              <span className='ml-2'>Atleast 1 small letter</span>
+            </div>
+            <div className={`flex items-center ${modalPassword !== "" ? validatePassword(modalPassword, /(?=.*\d)/) ? 'text-red-400' : 'text-green-400' : ""}`}>
+              {validatePassword(modalPassword, /(?=.*\d)/) ? <IoMdClose className={`${modalPassword === "" ? "text-white" : ""}`} /> : <FaCheck className={`${modalPassword === "" ? "text-white" : ""}`} />}
+              <span className='ml-2'>Atleast 1 number</span>
+            </div>
+            <div className={`flex items-center ${modalPassword !== "" ? validatePassword(modalPassword, /(?=.*[@$!%?#&])/) ? 'text-red-400' : 'text-green-400' : ""}`}>
+              {validatePassword(modalPassword, /(?=.*[@$!%?#&])/) ? <IoMdClose className={`${modalPassword === "" ? "text-white" : ""}`} /> : <FaCheck className={`${modalPassword === "" ? "text-white" : ""}`} />}
+              <span className='ml-2'>Atleast 1 special character @$!%?#&</span>
+            </div>
+            <div className={`flex items-center ${modalPassword !== "" ? validatePassword(modalPassword, /^.{8,20}$/) ? 'text-red-400' : 'text-green-400' : ""}`}>
+              {validatePassword(modalPassword, /^.{8,20}$/) ? <IoMdClose className={`${modalPassword === "" ? "text-white" : ""}`} /> : <FaCheck className={`${modalPassword === "" ? "text-white" : ""}`} />}
+              <span className='ml-2'>Length must be between 8 to 20</span>
+            </div>
+          </div>
+          {/* {modalPasswordError ? <label className="block mb-2 text-red-400">Error: Enter a valid password</label> : <></>} */}
 
           <label className="block mb-2">Confirm Password</label>
           <input className="border w-full p-2 mb-4"
             value={modalConfirmPassword}
+            type="password"
             onChange={(e) => {
               setModalConfirmPassword(e.target.value)
-              setModalConfirmPasswordError(false)
+              setModalConfirmPasswordError(e.target.value !== modalPassword || validatePassword(e.target.value))
             }}
           />
           {modalConfirmPasswordError ? <label className="block mb-2 text-red-400">Error: Incorrect password</label> : <></>}
