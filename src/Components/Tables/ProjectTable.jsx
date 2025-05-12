@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // Icons:
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegEdit, FaRegEye } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
@@ -69,9 +69,9 @@ const ProjectTable = (props) => {
                     rowData.access_role !== "read" ?
                       <>
                         <div className="flex gap-[8px]">
+                          <FaRegEye className="cursor-pointer" onClick={() => viewModels(rowData.id, rowData.name)} />
                           <FaRegEdit onClick={() => props.setEditableId(rowData.id)} className="hover:cursor-pointer" />
                           <MdDeleteOutline onClick={() => props.handleDelete(rowData.id, rowData.name)} className="hover:cursor-pointer" />
-                          <span className="w-10 h-5 bg-red-100 cursor-pointer" onClick={() => viewModels(rowData.id, rowData.name)}></span>
                         </div>
                       </>
                       :

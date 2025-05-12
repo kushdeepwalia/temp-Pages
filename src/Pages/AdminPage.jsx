@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useDeleteAdmins } from "../hooks/admins/useDeleteAdmins";
 import { useModifyAdmins } from "../hooks/admins/useModifyAdmins";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +25,7 @@ const AdminPage = () => {
   const [password, setPassword] = useState("");
   const [org, setOrg] = useState("");
   const [editableId, setEditableId] = useState();
+  const [viewPassword, setViewPassword] = useState(false);
   const [editableData, setEditableData] = useState();
   //   Modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -56,7 +58,30 @@ const AdminPage = () => {
   const { mutate: modifyAdmin, isLoading: modifyingLoader } = useModifyAdmins();
 
   const generatePassword = () => {
-    const pass = new RandExp(passwordRegex).gen();
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    const special = '@$!%?#&';
+    const all = lower + upper + digits + special;
+
+    // Ensure at least one of each required character
+    let password = [
+      lower[Math.floor(Math.random() * lower.length)],
+      upper[Math.floor(Math.random() * upper.length)],
+      digits[Math.floor(Math.random() * digits.length)],
+      special[Math.floor(Math.random() * special.length)],
+    ];
+
+
+    // Fill the rest randomly
+    const remainingLength = Math.floor(Math.random() * 13) + 4; // total length between 8 and 20
+    for (let i = 0; i < remainingLength; i++) {
+      password.push(all[Math.floor(Math.random() * all.length)]);
+    }
+
+    // Shuffle to avoid predictable positions
+    const pass = password.sort(() => Math.random() - 0.5).join('');
+
     console.log(pass);
     setPassword(pass);
   };
@@ -66,10 +91,9 @@ const AdminPage = () => {
     return !emailRegex.test(email);
   };
 
-  // const validatePassword = (password) => {
-  //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?#&])[A-Za-z\d@$!%?#&]{8,20}$/;
-  //   return !passwordRegex.test(password);
-  // };
+  const validatePassword = (password) => {
+    return !passwordRegex.test(password);
+  };
 
   useEffect(() => {
     if (email) {
@@ -83,6 +107,16 @@ const AdminPage = () => {
     setPhone("");
     setOrg("");
     setPassword("")
+    setViewPassword(false);
+  };
+
+  const resetEditForm = () => {
+    setName(editableData.name);
+    setEmail(editableData.email);
+    setPhone(editableData.phone_no);
+    setOrg(editableData.org_tenant_id);
+    setPassword("noChange")
+    setViewPassword(false);
   };
 
   useEffect(() => {
@@ -123,6 +157,7 @@ const AdminPage = () => {
       resetForm();
       setEditableId();
       setEditableData();
+      setViewPassword(false);
       setIsModalOpen(false);
     }
   }
@@ -149,6 +184,7 @@ const AdminPage = () => {
 
     resetForm();
     setIsModalOpen(false);
+    setViewPassword(false);
   };
 
   const navigate = useNavigate()
@@ -198,6 +234,7 @@ const AdminPage = () => {
               resetForm();
               setEditableId();
               setEditableData();
+              setViewPassword(false);
               setIsModalOpen(false);
             }}
             >
@@ -217,7 +254,18 @@ const AdminPage = () => {
 
             <label className="block mb-2">Password</label>
             <div className="flex mb-4">
-              <input type="password" className="border w-4/5 p-2" value={password} readOnly />
+              <div className="flex border relative w-4/5">
+                <input type={viewPassword ? "text" : "password"} className="w-full p-2" value={password} readOnly />
+                {
+                  password !== "noChange" ?
+                    viewPassword ?
+                      <LuEyeOff size={24} className="absolute right-2 top-2" onClick={() => setViewPassword(!viewPassword)} />
+                      :
+                      <LuEye size={24} className="absolute right-2 top-2" onClick={() => setViewPassword(!viewPassword)} />
+                    :
+                    <></>
+                }
+              </div>
               <button className="bg-blue-600 ml-2 cursor-pointer text-white px-4 rounded" onClick={generatePassword}>Generate</button>
             </div>
 
@@ -230,7 +278,7 @@ const AdminPage = () => {
             </select>
 
             <div className="flex justify-end gap-4">
-              <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
+              <button className="bg-gray-300 px-4 py-2 rounded" onClick={editableId ? resetEditForm : resetForm}>Reset</button>
               <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
             </div>
           </div>

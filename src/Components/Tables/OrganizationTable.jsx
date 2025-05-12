@@ -93,8 +93,8 @@ const OrganizationTable = (props) => {
             <td colSpan='6' className="items-center">
                 <div className="flex justify-evenly gap-4 items-center">
                     <p className="block">Entries: {filteredData.length}</p>
-                    <p className="block">Curret Page: {currentPage}</p>
-                    <p className="block">total Pages: {totalPages ? totalPages : 1}</p>
+                    <p className="block">Current Page: {currentPage}</p>
+                    <p className="block">Total Pages: {totalPages ? totalPages : 1}</p>
                     <select id="page-size"
                         value={pageSize}
                         onChange={(e) => {setPageSize(e.target.value)}}

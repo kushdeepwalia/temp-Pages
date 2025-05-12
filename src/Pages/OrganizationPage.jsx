@@ -120,20 +120,44 @@ const OrganizationPage = () => {
     );
   };
 
+  const getValidParentOrgs = (currentOrg) => {
+    const getOrgById = (id) => organizations.find(o => Number(o.tenant_id) === Number(id));
+
+    const isDescendant = (org, targetId) => {
+      if (!org?.parent_tenant_id) return false;
+      if (org.parent_tenant_id === targetId) return true;
+      const parent = getOrgById(org.parent_tenant_id);
+      return parent ? isDescendant(parent, targetId) : false;
+    };
+
+    return organizations.filter(org => {
+      const notSelf = org.tenant_id !== currentOrg.tenant_id;
+      const notDescendant = !isDescendant(org, currentOrg.tenant_id);
+      return notSelf && notDescendant;
+    });
+  };
+
   useEffect(() => {
     if (editableId) {
       const selectedOrg = organizations.filter((org) => Number(org.tenant_id) === Number(editableId))[0]
-      console.log(selectedOrg);
-      console.log(organizations);
       setProjectName(selectedOrg.org_name);
       setSelectedColor(selectedOrg.color_theme);
       setInputTypes(selectedOrg.allowed_inputs.slice(1, selectedOrg.allowed_inputs.length - 1).split(","));
       setOutputTypes(selectedOrg.allowed_outputs.slice(1, selectedOrg.allowed_outputs.length - 1).split(","));
       setParentOrg(selectedOrg.parent_tenant_id);
       setEditableData(selectedOrg);
+      console.log(getValidParentOrgs(selectedOrg))
       setIsModalOpen(true)
     }
   }, [editableId]);
+
+  const resetEditForm = () => {
+    setProjectName(editableData.org_name);
+    setSelectedColor(editableData.color_theme);
+    setInputTypes(editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1).split(","));
+    setOutputTypes(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(","));
+    setParentOrg(editableData.parent_tenant_id);
+  }
 
   const resetForm = () => {
     setProjectName("");
@@ -190,8 +214,12 @@ const OrganizationPage = () => {
     setIsModalOpen(false);
   };
 
+  const hasChildren = (selectedOrg) => {
+    return organizations.some(org => org.parent_org_name === selectedOrg);
+  };
+
   const handleDelete = (id, orgName) => {
-    if (orgName in groupAdmins() || orgName in groupProjects()) {
+    if (orgName in groupAdmins() || orgName in groupProjects() || hasChildren(orgName)) {
       console.log("Cannot delete")
       setDeleteModalData({ itemName: orgName, itemId: id });
       setIsCannotDeleteModalOpen(true);
@@ -237,7 +265,7 @@ const OrganizationPage = () => {
                     </div>
                   </div>
                 </div>
-                <OrganizationTable setEditableId={setEditableId} /*handleDelete={deleteOrg}*/ handleDelete={handleDelete} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
+                <OrganizationTable setEditableId={setEditableId} handleDelete={handleDelete} data={organizations || []} projectData={groupProjects()} adminData={groupAdmins()} />
               </div>
             </Body>
           </div>
@@ -311,7 +339,7 @@ const OrganizationPage = () => {
                   <option value="">Select Parent</option>
                   {
                     editableId ?
-                      organizations.filter((org) => editableData).map((org, index) => (
+                      getValidParentOrgs(editableData).map((org, index) => (
                         <option key={index} value={org.tenant_id}>{org.org_name}</option>
                       ))
                       :
@@ -322,7 +350,7 @@ const OrganizationPage = () => {
                 </select>
 
                 <div className="flex justify-end gap-4">
-                  <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
+                  <button className="bg-gray-300 px-4 py-2 rounded" onClick={editableId ? resetEditForm : resetForm}>Reset</button>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}> {addingLoader ? 'Adding...' : 'Add'}</button>
                 </div>
               </div>

@@ -105,6 +105,13 @@ const ProjectPage = () => {
     setOutputTypes([]);
   };
 
+  const resetEditForm = () => {
+    setProjectName(editableData.name);
+    setInputType(editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1));
+    setOutputTypes(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(","));
+    setOrg(editableData.org_tenant_id);
+  };
+
   useEffect(() => {
     if (editableId) {
       const selectedOrg = projects.filter((pro) => Number(pro.id) === Number(editableId))[0]
@@ -274,7 +281,7 @@ const ProjectPage = () => {
                 }
 
                 <div className="flex justify-end gap-4">
-                  <button className="bg-gray-300 px-4 py-2 rounded" onClick={resetForm}>Reset</button>
+                  <button className="bg-gray-300 px-4 py-2 rounded" onClick={editableId ? resetEditForm : resetForm}>Reset</button>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={editableId ? handleEdit : handleSubmit}>Submit</button>
                 </div>
               </div>
