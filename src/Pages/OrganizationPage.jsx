@@ -255,9 +255,11 @@ const OrganizationPage = () => {
                 <div className="bg-slate-100 h-[68px] flex justify-between items-center px-4">
                   <h2>Organizations</h2>
                   <div className="flex gap-4 items-center">
-                    <TfiReload className="hover:cursor-pointer" />
+                    <TfiReload onClick={async () => await queryClient.invalidateQueries({
+                      queryKey: ['organizations']
+                    })} className="hover:cursor-pointer" />
                     <div
-                      className="flex items-center cursor-pointer"
+                      className={`flex items-center cursor-pointer `}
                       onClick={() => setIsModalOpen(true)}
                     >
                       <p className="pr-1">Add</p>

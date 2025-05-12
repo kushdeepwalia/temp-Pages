@@ -15,6 +15,7 @@ import { useDeleteAdmins } from "../hooks/admins/useDeleteAdmins";
 import { useModifyAdmins } from "../hooks/admins/useModifyAdmins";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
 import { LuEye, LuEyeOff } from "react-icons/lu";
+import { queryClient } from "../utils/reactQuery";
 
 const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -169,7 +170,7 @@ const AdminPage = () => {
       return;
     }
     if (validateEmail(email)) {
-      return alert("Error");
+      return alert("Wrong Email");
     }
 
     const newAdmin = {
@@ -215,7 +216,9 @@ const AdminPage = () => {
             <div className="bg-slate-100 h-[68px] flex justify-between items-center px-4">
               <h2>Admin</h2>
               <div className="flex gap-4 items-center">
-                <TfiReload className="hover:cursor-pointer" />
+                <TfiReload onClick={async () => await queryClient.invalidateQueries({
+                  queryKey: ['admins']
+                })} className="hover:cursor-pointer" />
                 <div className="flex items-center cursor-pointer" onClick={() => setIsModalOpen(true)}>
                   <p className="pr-1">Add</p>
                   <FaPlus />

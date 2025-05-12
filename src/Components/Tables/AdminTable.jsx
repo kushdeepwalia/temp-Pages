@@ -7,6 +7,7 @@ import { MdDeleteOutline } from "react-icons/md";
 const AdminTable = (props) => {
   const [userId, setUserId] = useState(-1)
   const [userEmail, setUserEmail] = useState("")
+  const [userTenantId, setUserTenantId] = useState("")
   const [filterWord, setFilterWord] = useState("")
 
   useEffect(() => {
@@ -14,6 +15,7 @@ const AdminTable = (props) => {
       const user = JSON.parse(localStorage.getItem('user'))
       setUserId(user.id)
       setUserEmail(user.email)
+      setUserTenantId(user.tenant_id)
     }
   }, [userId])
 
@@ -66,13 +68,19 @@ const AdminTable = (props) => {
                           <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
                         </>
                         :
-                        Number(rowData.org_tenant_id) !== 1 || rowData.email !== userEmail ?
+                        rowData.email !== userEmail && rowData.email !== "mohitdcsa@gmail.com" ?
                           <>
                             <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
                             <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
                           </>
                           :
-                          <></>
+                          Number(userTenantId) === 1 && Number(rowData.org_tenant_id) !== 1 ?
+                            <>
+                              <FaRegEdit onClick={() => props.setEditableId(rowData.admin_id)} className="hover:cursor-pointer" />
+                              <MdDeleteOutline onClick={() => props.handleDelete(rowData.admin_id, rowData.name)} className="hover:cursor-pointer" />
+                            </>
+                            :
+                            <></>
 
                     }
                   </div>

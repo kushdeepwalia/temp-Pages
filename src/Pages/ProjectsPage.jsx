@@ -14,6 +14,7 @@ import { useAddProjects } from "../hooks/projects/useAddProjects";
 import { useDeleteProjects } from "../hooks/projects/useDeleteProjects";
 import { useModifyProjects } from "../hooks/projects/useModifyProjects";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
+import { queryClient } from "../utils/reactQuery";
 
 const ProjectPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -207,8 +208,10 @@ const ProjectPage = () => {
                 <div className="bg-slate-100 h-[68px] flex justify-between items-center px-4">
                   <h2>Project</h2>
                   <div className="flex gap-4 items-center">
-                    <TfiReload className="hover:cursor-pointer" />
-                    <div className="flex items-center cursor-pointer" onClick={() => setIsModalOpen(true)}>
+                    <TfiReload onClick={async () => await queryClient.invalidateQueries({
+                      queryKey: ['projects']
+                    })} className="hover:cursor-pointer" />
+                    <div className={`flex items-center cursor-pointer ${Number(tenantId) === 1 ? 'visible' : 'hidden'}`} onClick={() => setIsModalOpen(true)}>
                       <p className="pr-1">Add</p>
                       <FaPlus />
                     </div>
