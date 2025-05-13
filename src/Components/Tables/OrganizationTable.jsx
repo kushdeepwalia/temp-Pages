@@ -29,7 +29,7 @@ const OrganizationTable = (props) => {
 
   useEffect(() => {
     const newTotalPages = Math.ceil((filteredData?.length || 0) / pageSize)
-    setTotalPage( newTotalPages ? newTotalPages : 1)
+    setTotalPage(newTotalPages ? newTotalPages : 1)
     setCurrentPage(1);
     setPaginatedData(filteredData?.slice((currentPage - 1) * pageSize, currentPage * pageSize))
   }, [filteredData, pageSize])
@@ -57,6 +57,12 @@ const OrganizationTable = (props) => {
               Project
             </th>
             <th className="h-12 px-4 text-left align-middle">
+              State
+            </th>
+            <th className="h-12 px-4 text-left align-middle">
+              District
+            </th>
+            <th className="h-12 px-4 text-left align-middle">
               Parent Organization
             </th>
             <th className="h-12 px-4 text-left align-middle">
@@ -68,10 +74,12 @@ const OrganizationTable = (props) => {
           {
             paginatedData?.map((rowData, i) => (
               <tr key={"table-row-" + i}>
-                <td className="h-12 px-4 text-left align-middle">{(i + 1) + (currentPage-1) * pageSize}</td>
+                <td className="h-12 px-4 text-left align-middle">{(i + 1) + (currentPage - 1) * pageSize}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.adminData[rowData.org_name]?.length || 0}</td>
                 <td className="h-12 px-4 text-left align-middle">{props?.projectData[rowData.org_name]?.length || 0}</td>
+                <td className="h-12 px-4 text-left align-middle">{rowData.state}</td>
+                <td className="h-12 px-4 text-left align-middle">{rowData.district}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.parent_org_name === null ? "----------" : rowData.parent_org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">
                   {
@@ -91,36 +99,36 @@ const OrganizationTable = (props) => {
         <tfoot>
           <tr>
             <td colSpan='6' className="items-center">
-                <div className="flex justify-evenly gap-4 items-center">
-                    <p className="block">Entries: {filteredData.length}</p>
-                    <p className="block">Current Page: {currentPage}</p>
-                    <p className="block">Total Pages: {totalPages ? totalPages : 1}</p>
-                    <select id="page-size"
-                        value={pageSize}
-                        onChange={(e) => {setPageSize(e.target.value)}}
-                        className="border px-2 py-1 rounded"
-                    >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={99999}>All</option>
-                    </select>
-                    <button className={(currentPage === 1) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
-                            disabled={(currentPage === 1)}
-                            onClick={ () => {
-                                setCurrentPage(currentPage-1)
-                            }
-                        }>
-                            {"<"}
-                    </button>
-                    <button className={(currentPage === totalPages) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
-                            disabled={(currentPage === totalPages)}
-                            onClick={ () => {
-                                setCurrentPage(currentPage+1)
-                            }
-                        }>
-                            {">"}
-                    </button>
-                </div>
+              <div className="flex justify-evenly gap-4 items-center">
+                <p className="block">Entries: {filteredData.length}</p>
+                <p className="block">Current Page: {currentPage}</p>
+                <p className="block">Total Pages: {totalPages ? totalPages : 1}</p>
+                <select id="page-size"
+                  value={pageSize}
+                  onChange={(e) => { setPageSize(e.target.value) }}
+                  className="border px-2 py-1 rounded"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={99999}>All</option>
+                </select>
+                <button className={(currentPage === 1) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
+                  disabled={(currentPage === 1)}
+                  onClick={() => {
+                    setCurrentPage(currentPage - 1)
+                  }
+                  }>
+                  {"<"}
+                </button>
+                <button className={(currentPage === totalPages) ? "bg-gray-100 text-gray-300 px-4 py-2 rounded" : "bg-gray-300 px-4 py-2 rounded hover:cursor-pointer"}
+                  disabled={(currentPage === totalPages)}
+                  onClick={() => {
+                    setCurrentPage(currentPage + 1)
+                  }
+                  }>
+                  {">"}
+                </button>
+              </div>
             </td>
             {/* <CustomTablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}

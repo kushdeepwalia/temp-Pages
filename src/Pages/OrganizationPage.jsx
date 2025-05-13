@@ -19,13 +19,17 @@ import api from "../api";
 import { useDeleteOrganizations } from "../hooks/organizations/useDeleteOrganizations";
 import { useModifyOrganizations } from "../hooks/organizations/useModifyOrganizations";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
+import axios from "axios";
 
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [districtData, setDistrictData] = useState([]);
   const [inputTypes, setInputTypes] = useState([]);
   const [outputTypes, setOutputTypes] = useState([]);
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedColor, setSelectedColor] = useState("#ff0000");
   const [parentOrg, setParentOrg] = useState("");
   const [editableId, setEditableId] = useState();
   const [editableData, setEditableData] = useState();
@@ -61,6 +65,15 @@ const OrganizationPage = () => {
       return res.data.projects;
     },
     enabled: !!tenantId
+  });
+  const { data: allStates } = useQuery({
+    queryKey: ['allstates'],
+    queryFn: async () => {
+      const res = await axios.get(`https://api.data.gov.in/resource/a71e60f0-a21d-43de-a6c5-fa5d21600cdb?api-key=579b464db66ec23bdd00000142c630ed62984eec43d070c79fdd8f3f&format=json&limit=1000`);
+      return res.data.records;
+    },
+    enabled: !!tenantId,
+    staleTime: Infinity
   });
   const { mutate: addOrg, isLoading: addingLoader } = useAddOrganizations();
   const { mutate: deleteOrg, isLoading: deletingLoader } = useDeleteOrganizations();
@@ -145,11 +158,25 @@ const OrganizationPage = () => {
       setInputTypes(selectedOrg.allowed_inputs.slice(1, selectedOrg.allowed_inputs.length - 1).split(","));
       setOutputTypes(selectedOrg.allowed_outputs.slice(1, selectedOrg.allowed_outputs.length - 1).split(","));
       setParentOrg(selectedOrg.parent_tenant_id);
+      setSelectedState(selectedOrg.state);
+      handleFetchDistricts(allStates.filter((state) => state.state_name_english === selectedOrg.state)[0].state_code);
+      setSelectedDistrict(selectedOrg.district);
       setEditableData(selectedOrg);
       console.log(getValidParentOrgs(selectedOrg))
       setIsModalOpen(true)
     }
   }, [editableId]);
+
+  const handleFetchDistricts = (state_code) => {
+    fetch(`https://api.data.gov.in/resource/37231365-78ba-44d5-ac22-3deec40b9197?api-key=579b464db66ec23bdd00000142c630ed62984eec43d070c79fdd8f3f&format=json&limit=1000&filters%5Bstate_code%5D=${state_code}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setDistrictData(res.records);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+  }
 
   const resetEditForm = () => {
     setProjectName(editableData.org_name);
@@ -157,6 +184,9 @@ const OrganizationPage = () => {
     setInputTypes(editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1).split(","));
     setOutputTypes(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(","));
     setParentOrg(editableData.parent_tenant_id);
+    setSelectedState(editableData.state);
+    handleFetchDistricts(allStates.filter((state) => state.state_name_english === editableData.state)[0].state_code);
+    setSelectedDistrict(editableData.district);
   }
 
   const resetForm = () => {
@@ -165,6 +195,9 @@ const OrganizationPage = () => {
     setOutputTypes([]);
     setSelectedColor("");
     setParentOrg("");
+    setSelectedState("");
+    setSelectedDistrict("");
+    setDistrictData([]);
   };
 
   const handleEdit = () => {
@@ -174,7 +207,9 @@ const OrganizationPage = () => {
         (JSON.stringify(inputTypes.sort((a, b) => a - b)) === JSON.stringify(editableData.allowed_inputs.slice(1, editableData.allowed_inputs.length - 1).split(",").sort((a, b) => a - b))) &&
         (JSON.stringify(outputTypes.sort((a, b) => a - b)) === JSON.stringify(editableData.allowed_outputs.slice(1, editableData.allowed_outputs.length - 1).split(",").sort((a, b) => a - b))) &&
         selectedColor === editableData.color_theme &&
-        parentOrg === editableData.parent_tenant_id
+        parentOrg === editableData.parent_tenant_id &&
+        selectedState === editableData.state &&
+        selectedDistrict === editableData.district
       ) {
         alert("No field is modified.");
         return;
@@ -185,7 +220,9 @@ const OrganizationPage = () => {
         allowed_inputs: inputTypes,
         allowed_outputs: outputTypes,
         color_theme: selectedColor,
-        parent_tenant_id: parentOrg
+        parent_tenant_id: parentOrg,
+        state: selectedState,
+        district: selectedDistrict
       };
 
       modifyOrg({ id: editableId, projectData: modifiedOrg });
@@ -197,7 +234,9 @@ const OrganizationPage = () => {
   }
 
   const handleSubmit = () => {
-    if (!projectName || inputTypes.length === 0 || outputTypes.length === 0 || !selectedColor || !parentOrg) {
+    if (!projectName || inputTypes.length === 0 || outputTypes.length === 0 || !parentOrg || !selectedState || !selectedDistrict) {
+      // if (!projectName || inputTypes.length === 0 || outputTypes.length === 0 || !selectedColor || !parentOrg || !selectedState || !selectedDistrict) {
+      console.log(projectName, inputTypes, outputTypes, selectedColor, parentOrg)
       alert("Please fill all required fields.");
       return;
     }
@@ -205,8 +244,11 @@ const OrganizationPage = () => {
       name: projectName,
       allowed_inputs: inputTypes,
       allowed_outputs: outputTypes,
-      color_theme: selectedColor,
-      parent_tenant_id: parentOrg
+      color_theme: "#ff0000",
+      // color_theme: selectedColor,
+      parent_tenant_id: parentOrg,
+      state: selectedState,
+      district: selectedDistrict
     };
 
     addOrg(newOrg);
@@ -319,7 +361,7 @@ const OrganizationPage = () => {
                   ))}
                 </div>
 
-                <label className="block mb-2">Select Color</label>
+                {/* <label className="block mb-2">Select Color</label>
                 <div className="flex gap-4 mb-4">
                   {["#ff0000", "#008000", "#0000ff", "#adff2f"].map((color) => (
                     <div key={color} className={`border-2 rounded-full ${selectedColor === color ? "border-black" : "border-transparent"} p-0.5`}>
@@ -330,8 +372,38 @@ const OrganizationPage = () => {
                       />
                     </div>
                   ))}
-                </div>
+                </div> */}
 
+                <label className="block mb-2">States</label>
+                <select
+                  className="border w-full p-2 mb-4"
+                  value={selectedState}
+                  onChange={(e) => {
+                    setSelectedState(e.target.value);
+                    handleFetchDistricts(allStates.filter((state) => state.state_name_english === e.target.value)[0].state_code);
+                  }}
+                >
+                  <option value="">Select State</option>
+                  {
+                    allStates?.sort((a, b) => a.state_name_english.localeCompare(b.state_name_english)).map((state, index) => (
+                      <option key={index} value={state.state_name_english}>{state.state_name_english}</option>
+                    ))
+                  }
+                </select>
+
+                <label className="block mb-2">District</label>
+                <select
+                  className="border w-full p-2 mb-4"
+                  value={selectedDistrict}
+                  onChange={(e) => setSelectedDistrict(e.target.value)}
+                >
+                  <option value="">Select District</option>
+                  {
+                    districtData?.sort((a, b) => a.district_name_english.localeCompare(b.district_name_english)).map((district, index) => (
+                      <option key={index} value={district.district_name_english}>{district.district_name_english}</option>
+                    ))
+                  }
+                </select>
                 <label className="block mb-2">Parent Organisation</label>
                 <select
                   className="border w-full p-2 mb-4"
