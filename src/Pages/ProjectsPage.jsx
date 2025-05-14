@@ -34,7 +34,10 @@ const ProjectPage = () => {
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
-    queryFn: () => queryClient.getQueryData(['tenantId']),
+    queryFn: async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user.tenant_id
+    },
   });
   const { data: projects, isLoading: projectLoading, } = useQuery({
     queryKey: ['projects'],

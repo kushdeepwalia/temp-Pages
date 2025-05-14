@@ -35,7 +35,10 @@ const AdminPage = () => {
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
-    queryFn: () => queryClient.getQueryData(['tenantId']),
+    queryFn: async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user.tenant_id
+    },
   });
   const { data: admins, isLoading: adminLoading, } = useQuery({
     queryKey: ['admins'],

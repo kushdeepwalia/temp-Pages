@@ -39,13 +39,16 @@ const ModelList = ({ id = "", name = "" }) => {
   const [downloads, setDownloads] = useState(0);
   const [valids, setvalids] = useState(0);
   const { toast } = useToast();
-//   Modals
+  //   Modals
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteModalData, setDeleteModalData] = useState({itemName: "", itemId: ""})
+  const [deleteModalData, setDeleteModalData] = useState({ itemName: "", itemId: "" })
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
-    queryFn: () => queryClient.getQueryData(['tenantId']),
+    queryFn: async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user.tenant_id
+    },
   });
   const { data: projects, isLoading: projectLoading, } = useQuery({
     queryKey: ['projects'],
@@ -58,10 +61,10 @@ const ModelList = ({ id = "", name = "" }) => {
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false)
-    setDeleteModalData({itemName: "", itemId: ""})
+    setDeleteModalData({ itemName: "", itemId: "" })
   }
   const deleteButtonClick = (id, name) => {
-    setDeleteModalData({itemName: name, itemId: id});
+    setDeleteModalData({ itemName: name, itemId: id });
     setIsDeleteModalOpen(true)
   }
 
@@ -416,7 +419,7 @@ const ModelList = ({ id = "", name = "" }) => {
     <div className="bg-white rounded-lg shadow-sm p-6 w-[100%]">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">AR Model List</h2>
-        <Button asChild onClick={() => navigate("/model-upload", {state: {id,name}})}>
+        <Button asChild onClick={() => navigate("/model-upload", { state: { id, name } })}>
           <span>Add New</span>
         </Button>
       </div>
@@ -512,7 +515,7 @@ const ModelList = ({ id = "", name = "" }) => {
           </TableBody>
         </Table>
       </div>
-      <DeleteConfirmationModal isOpen={isDeleteModalOpen} itemData={deleteModalData} closeModal={closeDeleteModal} deleteItem={handleDeleteupdated}/>
+      <DeleteConfirmationModal isOpen={isDeleteModalOpen} itemData={deleteModalData} closeModal={closeDeleteModal} deleteItem={handleDeleteupdated} />
     </div>
   );
 };

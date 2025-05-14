@@ -6,6 +6,7 @@ import ProjectPage from './Pages/ProjectsPage';
 import LogsPage from './Pages/LogsPage';
 import ModelsPage from './Pages/ModelsPage';
 import ModelUploadForm from './Pages/ModelUploadForm';
+import ApprovalPage from './Pages/ApprovalPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path='/' element={<LoginPage />} />
           <Route path='/organization' element={<OrganizationPage />} />
           <Route path='/admin' element={<AdminPage />} />
+          <Route path='/approvals' element={<ApprovalPage />} />
           <Route path='/project' element={<ProjectPage />} />
           <Route path='/project/models' element={<ModelsPage />} />
           <Route path='/logs' element={<LogsPage />} />

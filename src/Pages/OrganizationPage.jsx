@@ -24,6 +24,7 @@ import axios from "axios";
 const OrganizationPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
+  const [pincode, setPincode] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtData, setDistrictData] = useState([]);
@@ -40,7 +41,10 @@ const OrganizationPage = () => {
 
   const { data: tenantId } = useQuery({
     queryKey: ['tenantId'],
-    queryFn: () => queryClient.getQueryData(['tenantId']),
+    queryFn: async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user.tenant_id
+    },
   });
   const { data: organizations, isLoading: orgLoading, isError: orgError } = useQuery({
     queryKey: ['organizations'],
@@ -374,36 +378,49 @@ const OrganizationPage = () => {
                   ))}
                 </div> */}
 
-                <label className="block mb-2">States</label>
-                <select
+                <label className="block mb-2">Pincode</label>
+                <input
                   className="border w-full p-2 mb-4"
-                  value={selectedState}
+                  value={pincode}
                   onChange={(e) => {
-                    setSelectedState(e.target.value);
-                    handleFetchDistricts(allStates.filter((state) => state.state_name_english === e.target.value)[0].state_code);
+                    setPincode(e.target.value)
+                    if (e.target.value.length === 6 && e.target.value !== pincode) {
+                      fetch('https://api.postalpincode.in/pincode/' + e.target.value)
+                        .then((res) => res.json())
+                        .then((res) => {
+                          if (res[0].Status === "Error") {
+                            alert("Enter correct pincode");
+                          }
+                          else {
+                            setSelectedState(res[0].PostOffice[0].State)
+                            setSelectedDistrict(res[0].PostOffice[0].District)
+                          }
+                        })
+                        .catch((error) => console.error(error))
+                    }
+                    else if (e.target.value !== 6) {
+                      setSelectedState("")
+                      setSelectedDistrict("")
+                    }
                   }}
-                >
-                  <option value="">Select State</option>
-                  {
-                    allStates?.sort((a, b) => a.state_name_english.localeCompare(b.state_name_english)).map((state, index) => (
-                      <option key={index} value={state.state_name_english}>{state.state_name_english}</option>
-                    ))
-                  }
-                </select>
-
-                <label className="block mb-2">District</label>
-                <select
+                />
+                <label className="block mb-2">State</label>
+                <input
                   className="border w-full p-2 mb-4"
+                  readOnly
+                  placeholder="State"
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                />
+                <label className="block mb-2">District</label>
+                <input
+                  className="border w-full p-2 mb-4"
+                  readOnly
+                  placeholder="District"
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
-                >
-                  <option value="">Select District</option>
-                  {
-                    districtData?.sort((a, b) => a.district_name_english.localeCompare(b.district_name_english)).map((district, index) => (
-                      <option key={index} value={district.district_name_english}>{district.district_name_english}</option>
-                    ))
-                  }
-                </select>
+                />
+
                 <label className="block mb-2">Parent Organisation</label>
                 <select
                   className="border w-full p-2 mb-4"

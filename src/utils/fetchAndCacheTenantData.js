@@ -4,15 +4,16 @@ import api from '../api/';
 import axios from 'axios';
 
 export const fetchAndCacheTenantData = async (tenantId) => {
-  const [orgs, projects, models, admins, states] = await Promise.all([
+  const [orgs, projects, models, admins, states, approvals] = await Promise.all([
     api.get(`/org/getAll`),
     api.get(`/project/getAll`),
     api.get(`/model/getAll`),
     api.get(`/admin/getAll`),
-    axios.get('https://api.data.gov.in/resource/a71e60f0-a21d-43de-a6c5-fa5d21600cdb?api-key=579b464db66ec23bdd00000142c630ed62984eec43d070c79fdd8f3f&format=json&limit=1000')
+    axios.get('https://api.data.gov.in/resource/a71e60f0-a21d-43de-a6c5-fa5d21600cdb?api-key=579b464db66ec23bdd00000142c630ed62984eec43d070c79fdd8f3f&format=json&limit=1000'),
+    api.get(`/auth/user/approvals`)
   ]);
 
-  console.log(orgs, projects, models, admins, states)
+  console.log(orgs, projects, models, admins, states, approvals)
 
   queryClient.setQueryData(['tenantId'], tenantId);
 
@@ -30,4 +31,7 @@ export const fetchAndCacheTenantData = async (tenantId) => {
 
   if (states.status === 200) queryClient.setQueryData(['allstates'], states.data.records);
   else queryClient.setQueryData(['admins'], []);
+
+  if (approvals.data.length != 0) queryClient.setQueryData(['approvals'], approvals.data);
+  else queryClient.setQueryData(['approvals'], []);
 };

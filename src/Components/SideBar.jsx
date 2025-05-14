@@ -25,6 +25,7 @@ const SideBar = (props) => {
             </>
         }
         <p onClick={() => navigate('/project')} className={"hover:cursor-pointer " + (props.activate == "project" ? "bg-amber-300" : "")}>Projects</p>
+        <p onClick={() => navigate('/approvals')} className={"hover:cursor-pointer " + (props.activate == "approval" ? "bg-amber-300" : "")}>Approvals</p>
         {/* <p onClick={() => navigate('/model')} className={"hover:cursor-pointer " + (props.activate == "model" ? "bg-amber-300" : "")}>Model</p> */}
         {/* <p onClick={() => navigate('/logs')} className={ "hover:cursor-pointer " + (props.activate == "logs" ? "bg-amber-300" : "")}>Logs</p> */}
         {/* <IconButton to='/dashboard' active={props.activate == 'dashboard' ? true : false}/>
