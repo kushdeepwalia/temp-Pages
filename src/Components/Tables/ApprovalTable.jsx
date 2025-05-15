@@ -7,7 +7,7 @@ import { queryClient } from '../../utils/reactQuery';
 const ApprovalTable = (props) => {
 
   const returnMonth = (month) => {
-    switch (month) {
+    switch (month + 1) {
       case 1: return "January";
       case 2: return "February";
       case 3: return "March";
@@ -69,7 +69,7 @@ const ApprovalTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{new Date(rowData.dob).getDate() + " " + returnMonth(new Date(rowData.dob).getMonth()) + ", " + new Date(rowData.dob).getFullYear()}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.state}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.district}</td>
-                <td className="h-12 px-4 text-left align-middle">{rowData.tenant_id}</td>
+                <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.phone_no}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.status}</td>
                 <td className="h-12 px-4 text-left align-middle">
