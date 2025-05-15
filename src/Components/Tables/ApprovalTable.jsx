@@ -71,7 +71,7 @@ const ApprovalTable = (props) => {
                 <td className="h-12 px-4 text-left align-middle">{rowData.district}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.org_name}</td>
                 <td className="h-12 px-4 text-left align-middle">{rowData.phone_no}</td>
-                <td className="h-12 px-4 text-left align-middle">{rowData.status}</td>
+                <td className="h-12 px-4 text-left capitalize align-middle">{rowData.status}</td>
                 <td className="h-12 px-4 text-left align-middle">
                   <div className='flex justify-center'>
                     {
