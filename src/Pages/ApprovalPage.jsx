@@ -102,7 +102,7 @@ const ApprovalPage = () => {
                 className="text-blue-600 underline text-sm"
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = 'http://localhost:2000/auth/download-sample/'; // Update this to match your backend route
+                  link.href = 'https://manorama.adminportal.anganwaditest.co.in/auth/download-sample/'; // Update this to match your backend route
                   link.setAttribute('download', 'sample.csv');
                   document.body.appendChild(link);
                   link.click();
