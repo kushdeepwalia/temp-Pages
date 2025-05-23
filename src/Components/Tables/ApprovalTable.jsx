@@ -121,7 +121,7 @@ const ApprovalTable = (props) => {
                                 queryKey: ['approvals']
                               })
                             }}
-                            className='cursor-pointer text-red-400 w-max rounded'
+                            className='cursor-pointer ml-2 text-red-400 w-max rounded'
                           >
                             <TbTrashFilled size={24} className='font-bold' />
                           </div>

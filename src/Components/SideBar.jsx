@@ -7,7 +7,7 @@ const SideBar = (props) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    console.log(user);
+    // console.log(user);
     setTenantId(Number(user.tenant_id));
   }, []);
 
@@ -28,13 +28,6 @@ const SideBar = (props) => {
         <p onClick={() => navigate('/approvals')} className={"hover:cursor-pointer " + (props.activate == "approval" ? "bg-amber-300" : "")}>Approvals</p>
         {/* <p onClick={() => navigate('/model')} className={"hover:cursor-pointer " + (props.activate == "model" ? "bg-amber-300" : "")}>Model</p> */}
         {/* <p onClick={() => navigate('/logs')} className={ "hover:cursor-pointer " + (props.activate == "logs" ? "bg-amber-300" : "")}>Logs</p> */}
-        {/* <IconButton to='/dashboard' active={props.activate == 'dashboard' ? true : false}/>
-            <IconButton to='/roi' icon={roiIcon} active={props.activate == 'roi' ? true : false}/>
-            <IconButton to='/' icon={emoteIcon}/>
-            <IconButton to='/' icon={vizIcon}/>
-            <IconButton to='/' icon={vizIcon}/>
-            <IconButton to='/' icon={bridgeIcon}/>
-            <IconButton to='/' icon={libraryIcon}/> */}
       </div>
     </div>
   </>

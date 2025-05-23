@@ -22,6 +22,16 @@ const LoginPage = () => {
   const [modalConfirmPasswordError, setModalConfirmPasswordError] = useState(false);
   const [viewPassword, setViewPassword] = useState(false);
 
+  useEffect(() => {
+    window.addEventListener("keydown", (e) => {
+      if (e.code) {
+        if (e.code.toLowerCase() === "enter" || e.code.toLowerCase() === "numpadenter") {
+          document.getElementById("loginBtn").click()
+        }
+      }
+    })
+  }, [])
+
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return !emailRegex.test(email);
@@ -155,7 +165,7 @@ const LoginPage = () => {
             {passwordError && <span className='text-sm pl-1 text-red-400'>Error in password*</span>}
           </div>
         </div>
-        <Button onClick={loginBtnClick}>Login</Button>
+        <Button id="loginBtn" onClick={loginBtnClick}>Login</Button>
       </div>
     </Body>
     {isModalOpen && (
