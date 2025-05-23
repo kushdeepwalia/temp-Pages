@@ -1,6 +1,7 @@
 import React from 'react'
 import { RxCheck, RxCross2, RxTrash } from 'react-icons/rx';
 import { TbTrashFilled } from 'react-icons/tb';
+import { MdModeEdit } from "react-icons/md";
 import api from '../../api';
 import { queryClient } from '../../utils/reactQuery';
 
@@ -102,6 +103,17 @@ const ApprovalTable = (props) => {
                         </>
                         :
                         <>
+                          <div
+                            onClick={async () => {
+                              await api.patch('/auth/user/status/pending/' + rowData.id);
+                              await queryClient.invalidateQueries({
+                                queryKey: ['approvals']
+                              })
+                            }}
+                            className='cursor-pointer text-red-400 w-max rounded'
+                          >
+                            <MdModeEdit size={24} className='font-bold' />
+                          </div>
                           <div
                             onClick={async () => {
                               await api.delete('/auth/user/delete/' + rowData.id);
